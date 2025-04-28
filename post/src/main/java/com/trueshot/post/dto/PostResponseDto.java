@@ -1,0 +1,29 @@
+package com.trueshot.post.dto;
+
+import com.trueshot.post.entity.Post;
+import lombok.*;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class PostResponseDto {
+    private String title;
+    private String content;
+    private String url;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    public static PostResponseDto convert(Post post) {
+        return PostResponseDto.builder()
+                .title(post.getTitle())
+                .content(post.getContent())
+                .url(post.getUrl())
+                .createdAt(post.getCreatedAt())
+                .updatedAt(post.getUpdatedAt())
+                .build();
+    }
+}
