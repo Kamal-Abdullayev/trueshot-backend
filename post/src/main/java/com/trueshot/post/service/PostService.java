@@ -1,8 +1,6 @@
 package com.trueshot.post.service;
 
-import com.trueshot.post.dto.PostCreateRequestDto;
-import com.trueshot.post.dto.PostResponseDto;
-import com.trueshot.post.dto.PostUpdateDto;
+import com.trueshot.post.dto.*;
 import com.trueshot.post.entity.Post;
 import com.trueshot.post.exception.ResourceNotFoundException;
 import com.trueshot.post.repository.PostRepository;
@@ -10,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
 import java.util.List;
@@ -18,39 +18,56 @@ import java.util.List;
 @Service
 public class PostService {
     private final PostRepository postRepository;
+    private final WebClient webClient;
 
-    public List<PostResponseDto> getAllProducts(Pageable pageable) {
+
+    public List<PostResponseDto> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable).stream()
                 .map(PostResponseDto::convert)
                 .toList();
     }
 
-    public PostResponseDto getProductById(String productId) {
-        return PostResponseDto.convert(getProductObjectById(productId));
+    public PostResponseDto getPostById(String postId) {
+        return PostResponseDto.convert(getPostObjectById(postId));
     }
 
-    public Post getProductObjectById(String productId) {
-        if (productId == null || productId.isEmpty()) {
-            throw new InvalidParameterException("Invalid product id");
+    public Post getPostObjectById(String postId) {
+        if (postId == null || postId.isEmpty()) {
+            throw new InvalidParameterException("Invalid post id");
         }
-        return postRepository.findById(productId).orElseThrow(
-                () -> new ResourceNotFoundException("Product not found")
+        return postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Post not found")
         );
     }
 
     @Transactional
-    public PostResponseDto saveProduct(PostCreateRequestDto postCreateRequestDto) {
+    public PostResponseDto savePost(PostCreateRequestDto postCreateRequestDto) {
+        //todo: change hard coded part
+        Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
+                .uri("http://localhost:8080/api/v1/image/upload")
+                .bodyValue(new MediaProcessUploadImageRequestDto(
+                        postCreateRequestDto.getImageContent(),
+                        "image"
+                ))
+                .retrieve()
+                .bodyToMono(MediaProcessUploadImageResponseDto.class);
+
+        MediaProcessUploadImageResponseDto response = responseMono.block();
+        if (response == null || response.getImagePath() == null) {
+            throw new ResourceNotFoundException("Image not found");
+        }
+
         Post post = Post.builder()
                 .title(postCreateRequestDto.getTitle())
                 .content(postCreateRequestDto.getContent())
-                .url(postCreateRequestDto.getUrl())
+                .url(response.getImagePath())
                 .build();
 
         return PostResponseDto.convert(postRepository.save(post));
     }
 
-    public PostResponseDto updateProduct(String postId, PostUpdateDto postUpdateDto) {
-        Post dbPost = getProductObjectById(postId);
+    public PostResponseDto updatePost(String postId, PostUpdateDto postUpdateDto) {
+        Post dbPost = getPostObjectById(postId);
         if (!postUpdateDto.getTitle().equals(dbPost.getTitle())) {
             dbPost.setTitle(postUpdateDto.getTitle());
         }
@@ -63,8 +80,8 @@ public class PostService {
         return PostResponseDto.convert(postRepository.save(dbPost));
     }
 
-    public void deleteProduct(String postId) {
-        Post dbPost = getProductObjectById(postId);
+    public void deletePost(String postId) {
+        Post dbPost = getPostObjectById(postId);
         postRepository.delete(dbPost);
     }
 

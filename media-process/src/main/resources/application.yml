@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: media-process
+server:
+  port: 8080
+
+minio:
+  bucket-name: true-shot-media
+  access-key: test_user
+  secret-key: test_password
+  url: http://localhost:9000
+
+
+helper:
+  app-ip: ${APP_IP:http://localhost}
+  base-url: ${helper.app-ip}:${server.port}
+  image-folder-path: /api/v1/image

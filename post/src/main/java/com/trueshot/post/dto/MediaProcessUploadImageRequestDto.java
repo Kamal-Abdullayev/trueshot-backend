@@ -7,9 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostCreateRequestDto {
-    private String title;
-    private String content;
+public class MediaProcessUploadImageRequestDto {
     private String imageContent;
-
+    private String imageName;
 }
