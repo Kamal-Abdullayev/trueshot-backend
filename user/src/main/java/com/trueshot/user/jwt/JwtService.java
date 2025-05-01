@@ -47,11 +47,9 @@ public class JwtService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
             Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
             String rolesClaim = roles.toString();
-            log.info("rolesClaim  {} ", rolesClaim);
             int start = rolesClaim.indexOf("[");
             int end = rolesClaim.indexOf("]");
             rolesClaim = rolesClaim.substring(start + 1, end);
-            log.info("claims  {} ", rolesClaim);
         
         // After, extracting the authorities/roles and removing the "[" "]", e are adding the authorities/roles to the claim 
             claims.put("roles", rolesClaim); 
@@ -119,7 +117,6 @@ public class JwtService {
     // A funtion to validate the token, it takes the token and userDetails as input, and check username and whther the token is not expiered 
     public Boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        log.info("extractRoles  {} ", extractRoles(token));
         return (username.equals(userDetails.getUsername())  && !isTokenExpired(token));
     }
 }

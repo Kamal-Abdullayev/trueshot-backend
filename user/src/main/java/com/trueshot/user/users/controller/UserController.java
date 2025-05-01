@@ -41,10 +41,8 @@ public class UserController {
         
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userDto.getName(), userDto.getPassword()));
        // If the user is authenticated we generate the token, otherwise, we throw an exception
-        log.info("authentication.isAuthenticated()  {} ", authentication);
 
         if (authentication.isAuthenticated()) {
-        log.info("jwtService.generateToken(authRequest.getName())  {} ", jwtService.generateToken(userDto.getName()).toString());
             return jwtService.generateToken(userDto.getName());
         } else {
             throw new UsernameNotFoundException("The user cannot be authenticated");
