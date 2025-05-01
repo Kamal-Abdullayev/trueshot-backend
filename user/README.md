@@ -1,7 +1,6 @@
-
 # Trueshot User Service
 
-This is a Spring Boot microservice for user management and JWT-based authentication.
+This is a Spring Boot microservice for user management, following system, and JWT-based authentication.
 
 ## 🔧 Technologies Used
 
@@ -41,15 +40,15 @@ App will start at: [http://localhost:8087](http://localhost:8087)
 
 ## 🔐 API Endpoints
 
-| Method | Endpoint                      | Description               | Auth Required |
-|--------|-------------------------------|---------------------------|---------------|
-| POST   | `/api/auth/signup`            | Register new user         | ❌            |
-| POST   | `/api/auth/authenticate`      | Login & get JWT token     | ❌            |
-| POST   | `/api/users/follow/{userId}`  | Follow a user             | ✅            |
-| POST   | `/api/users/unfollow/{userId}`| Unfollow a user           | ✅            |
-| GET    | `/api/users/followers`        | Get your followers        | ✅            |
-| GET    | `/api/users/following`        | Get users you follow      | ✅            |
-| GET    | `/api/users/suggestions`      | Get user follow suggestions | ✅        |
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/auth/signup` | Register new user | ❌ |
+| POST | `/api/auth/authenticate` | Login & get JWT token | ❌ |
+| POST | `/api/follow/follow/{followingId}` | Follow a user | ✅ |
+| POST | `/api/follow/unfollow/{followingId}` | Unfollow a user | ✅ |
+| GET  | `/api/follow/suggestions` | Get follow suggestions | ✅ |
+| GET  | `/api/follow/following` | List following users | ✅ |
+| GET  | `/api/follow/followers` | List followers | ✅ |
 
 ---
 
@@ -67,36 +66,36 @@ curl -X POST http://localhost:8087/api/auth/signup  -H "Content-Type: applicatio
 curl -X POST http://localhost:8087/api/auth/authenticate  -H "Content-Type: application/json"  -d '{"name": "testuser", "password": "testpass"}'
 ```
 
-Returns a JWT token.
+Returns JWT token.
 
 ### 🔸 Follow a user
 
 ```bash
-curl -X POST http://localhost:8087/api/users/follow/{userId}  -H "Authorization: Bearer <JWT_TOKEN>"
+curl -X POST http://localhost:8087/api/follow/follow/{followingId}  -H "Authorization: Bearer <your_token>"
 ```
 
 ### 🔸 Unfollow a user
 
 ```bash
-curl -X POST http://localhost:8087/api/users/unfollow/{userId}  -H "Authorization: Bearer <JWT_TOKEN>"
+curl -X POST http://localhost:8087/api/follow/unfollow/{followingId}  -H "Authorization: Bearer <your_token>"
 ```
 
-### 🔸 Get your followers
+### 🔸 Get follow suggestions
 
 ```bash
-curl -X GET http://localhost:8087/api/users/followers  -H "Authorization: Bearer <JWT_TOKEN>"
+curl -X GET http://localhost:8087/api/follow/suggestions  -H "Authorization: Bearer <your_token>"
 ```
 
-### 🔸 Get users you follow
+### 🔸 Get following users
 
 ```bash
-curl -X GET http://localhost:8087/api/users/following  -H "Authorization: Bearer <JWT_TOKEN>"
+curl -X GET http://localhost:8087/api/follow/following  -H "Authorization: Bearer <your_token>"
 ```
 
-### 🔸 Get suggested users to follow
+### 🔸 Get followers
 
 ```bash
-curl -X GET http://localhost:8087/api/users/suggestions  -H "Authorization: Bearer <JWT_TOKEN>"
+curl -X GET http://localhost:8087/api/follow/followers  -H "Authorization: Bearer <your_token>"
 ```
 
 ---
@@ -108,8 +107,6 @@ Visit: [http://localhost:8087/swagger-ui/index.html](http://localhost:8087/swagg
 ---
 
 ## ⚙️ Environment Config
-
-Update `application.properties` as needed:
 
 ```properties
 server.port=8087
