@@ -15,18 +15,16 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
     @Autowired
     private PasswordEncoder passwordEncoder;
-    
+
     public User addUser(User user) {
         if (userRepository.findByName(user.getName()).isPresent()) {
             throw new IllegalArgumentException("User with name '" + user.getName() + "' already exists.");
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        log.info("A new user  {} is added", user.toString());
-        //return "A new user is added to system ";
         return user;
-    } 
+    }
 }

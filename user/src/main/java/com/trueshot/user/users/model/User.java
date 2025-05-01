@@ -1,33 +1,42 @@
 package com.trueshot.user.users.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import lombok.*;
+
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
-
-//import javax.persistence.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "users")
 @Builder
-@Data
+@Getter
+@Setter
+@ToString(exclude = { "following", "followers" })
+@EqualsAndHashCode(exclude = { "following", "followers" })
 @AllArgsConstructor
-@NoArgsConstructor 
+@NoArgsConstructor
 public class User {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id") 
+    @Column(name = "user_id")
     private UUID id;
-    @Column(unique = true) 
+
+    @Column(unique = true)
     private String name;
+
     private String password;
+
     private String roles;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "user_followers", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
+    @JsonIgnore
+    private Set<User> following = new HashSet<>();
+
+    @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Set<User> followers = new HashSet<>();
 }
