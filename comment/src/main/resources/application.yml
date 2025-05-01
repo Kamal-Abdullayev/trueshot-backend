@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: comment
+  datasource:
+    url: jdbc:postgresql://localhost:5433/trueshot_db
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+server:
+  port: 8082
+
+application:
+  security:
+    jwt:
+      secret-key: p5VDU8b2L0uOi1TyJ1uyMZmkfXrZStDdp0Kb+7Ksmw0=
