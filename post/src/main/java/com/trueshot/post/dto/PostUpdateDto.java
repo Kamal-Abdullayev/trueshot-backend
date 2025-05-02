@@ -12,4 +12,5 @@ public class PostUpdateDto {
     private String content;
     private String url;
 
+    private String userId;
 }

@@ -20,7 +20,6 @@ public class PostService {
     private final PostRepository postRepository;
     private final WebClient webClient;
 
-
     public List<PostResponseDto> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable).stream()
                 .map(PostResponseDto::convert)
@@ -42,7 +41,7 @@ public class PostService {
 
     @Transactional
     public PostResponseDto savePost(PostCreateRequestDto postCreateRequestDto) {
-        //todo: change hard coded part
+        // Upload the image
         Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
                 .uri("http://localhost:8080/api/v1/image/upload")
                 .bodyValue(new MediaProcessUploadImageRequestDto(
@@ -57,10 +56,12 @@ public class PostService {
             throw new ResourceNotFoundException("Image not found");
         }
 
+        // Create and save the post
         Post post = Post.builder()
                 .title(postCreateRequestDto.getTitle())
                 .content(postCreateRequestDto.getContent())
                 .url(response.getImagePath())
+                .userId(postCreateRequestDto.getUserId())
                 .build();
 
         return PostResponseDto.convert(postRepository.save(post));
@@ -68,15 +69,17 @@ public class PostService {
 
     public PostResponseDto updatePost(String postId, PostUpdateDto postUpdateDto) {
         Post dbPost = getPostObjectById(postId);
-        if (!postUpdateDto.getTitle().equals(dbPost.getTitle())) {
+
+        if (postUpdateDto.getTitle() != null && !postUpdateDto.getTitle().equals(dbPost.getTitle())) {
             dbPost.setTitle(postUpdateDto.getTitle());
         }
-        if (!postUpdateDto.getContent().equals(dbPost.getContent())) {
+        if (postUpdateDto.getContent() != null && !postUpdateDto.getContent().equals(dbPost.getContent())) {
             dbPost.setContent(postUpdateDto.getContent());
         }
-        if (!postUpdateDto.getUrl().equals(dbPost.getUrl())) {
+        if (postUpdateDto.getUrl() != null && !postUpdateDto.getUrl().equals(dbPost.getUrl())) {
             dbPost.setUrl(postUpdateDto.getUrl());
         }
+
         return PostResponseDto.convert(postRepository.save(dbPost));
     }
 
@@ -84,5 +87,4 @@ public class PostService {
         Post dbPost = getPostObjectById(postId);
         postRepository.delete(dbPost);
     }
-
 }

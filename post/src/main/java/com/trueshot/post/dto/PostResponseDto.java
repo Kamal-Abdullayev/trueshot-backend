@@ -14,6 +14,9 @@ public class PostResponseDto {
     private String title;
     private String content;
     private String url;
+    private String userId;
+
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -22,6 +25,7 @@ public class PostResponseDto {
                 .title(post.getTitle())
                 .content(post.getContent())
                 .url(post.getUrl())
+                .userId(post.getUserId())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();
