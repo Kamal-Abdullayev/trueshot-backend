@@ -56,4 +56,11 @@ public class UserController {
         return userService.addUser(user);
     }
 
+    @GetMapping("/user/id-by-username")
+    public String getUserIdByUsername(@RequestParam String username) {
+        User user = userService.getUserByUsername(username);
+        return user.getId().toString();
+    }
+
+
 }

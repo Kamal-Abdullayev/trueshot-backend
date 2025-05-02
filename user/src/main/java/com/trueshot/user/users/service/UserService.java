@@ -3,6 +3,8 @@ package com.trueshot.user.users.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+
 
 import com.trueshot.user.users.model.User;
 import com.trueshot.user.users.repository.UserRepository;
@@ -27,4 +29,11 @@ public class UserService {
         userRepository.save(user);
         return user;
     }
+
+    public User getUserByUsername(String username) {
+        return userRepository.findByName(username).orElseThrow(() ->
+                new UsernameNotFoundException("User not found")
+        );
+    }
+
 }

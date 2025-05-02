@@ -87,4 +87,12 @@ public class PostService {
         Post dbPost = getPostObjectById(postId);
         postRepository.delete(dbPost);
     }
+
+    public List<PostResponseDto> getPostsByUserIds(List<String> userIds) {
+        List<Post> posts = postRepository.findAllByUserIdIn(userIds);
+        return posts.stream()
+                .map(PostResponseDto::convert)
+                .toList();
+    }
+
 }
