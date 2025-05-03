@@ -19,7 +19,7 @@ public class FeedService {
     public List<PostResponseDto> getUserFeed(String userId, String token) {
         // 1. Fetch full UserResponseDto list
         List<UserResponseDto> followedUsers = webClient.get()
-                .uri("http://localhost:8087/api/follow/following")
+                .uri("http://localhost:8087/api/v1/follow/following")
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .bodyToMono(new ParameterizedTypeReference<List<UserResponseDto>>() {})

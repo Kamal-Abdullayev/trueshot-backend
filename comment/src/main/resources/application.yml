@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: comment
+
+server:
+  port: 8082
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8099/eureka
+

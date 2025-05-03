@@ -15,3 +15,10 @@ helper:
   app-ip: ${APP_IP:http://localhost}
   base-url: ${helper.app-ip}:${server.port}
   image-folder-path: /api/v1/image
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8099/eureka

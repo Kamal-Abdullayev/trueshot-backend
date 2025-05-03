@@ -19,7 +19,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/follow")
+@RequestMapping("/api/v1/follow")
 @RequiredArgsConstructor
 public class UserFollowController {
     @Autowired
