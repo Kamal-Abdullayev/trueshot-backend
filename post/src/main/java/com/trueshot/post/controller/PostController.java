@@ -3,21 +3,26 @@ package com.trueshot.post.controller;
 import com.trueshot.post.dto.PostCreateRequestDto;
 import com.trueshot.post.dto.PostResponseDto;
 import com.trueshot.post.dto.PostUpdateDto;
+import com.trueshot.post.jwt.JwtService;
 import com.trueshot.post.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/post")
 @RestController
 public class PostController {
+
     private final PostService postService;
+    private final JwtService jwtService;
+    private final WebClient webClient;
+
 
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable String id) {
@@ -26,12 +31,23 @@ public class PostController {
 
     @GetMapping("/all")
     public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(name = "page", defaultValue = "0") int page,
-                                                             @RequestParam(name = "size", defaultValue = "5" ) int size) {
+                                                             @RequestParam(name = "size", defaultValue = "5") int size) {
         return new ResponseEntity<>(postService.getAllPosts(PageRequest.of(page, size)), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateRequestDto post) {
+    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateRequestDto post,
+                                                      @RequestHeader("Authorization") String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        String username = jwtService.extractUsername(token);
+        String userId = webClient.get()
+                .uri("http://localhost:8087/api/auth/user/id-by-username?username=" + username)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        post.setUserId(userId);
+
         return new ResponseEntity<>(postService.savePost(post), HttpStatus.CREATED);
     }
 
@@ -45,4 +61,11 @@ public class PostController {
         postService.deletePost(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
+
+    @PostMapping("/by-user-ids")
+    public ResponseEntity<List<PostResponseDto>> getPostsByUserIds(@RequestBody List<String> userIds) {
+        return ResponseEntity.ok(postService.getPostsByUserIds(userIds));
+    }
+
+
 }

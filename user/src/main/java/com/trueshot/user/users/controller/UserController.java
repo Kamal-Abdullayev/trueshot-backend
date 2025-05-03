@@ -1,11 +1,14 @@
 package com.trueshot.user.users.controller;
 
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.trueshot.user.jwt.JwtService;
 import com.trueshot.user.users.dto.UserDto;
@@ -55,5 +58,22 @@ public class UserController {
     public User signupUser(@RequestBody User user){
         return userService.addUser(user);
     }
+
+    @GetMapping("/user/id-by-username")
+    public String getUserIdByUsername(@RequestParam String username) {
+        User user = userService.getUserByUsername(username);
+        return user.getId().toString();
+    }
+
+    @GetMapping("/user/ids")
+    public List<UUID> getAllUserIds() {
+        return userService.getAllUsers()
+                .stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
+
+
+
 
 }
