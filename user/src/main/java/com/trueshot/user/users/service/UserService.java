@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.util.List;
+
 
 
 import com.trueshot.user.users.model.User;
@@ -35,5 +37,11 @@ public class UserService {
                 new UsernameNotFoundException("User not found")
         );
     }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+
 
 }
