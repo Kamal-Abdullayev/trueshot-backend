@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: user
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8087
+
+application:
+  security:
+    jwt:
+      secret-key: p5VDU8b2L0uOi1TyJ1uyMZmkfXrZStDdp0Kb+7Ksmw0=
+
+eureka:
+  instance:
+    hostname: localhost
+  client:
+    service-url:
+      defaultZone: http://localhost:8099/eureka
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql: trace
+    org.hibernate: error
+    org.hibernate.collection: error
+    org.springframework: info

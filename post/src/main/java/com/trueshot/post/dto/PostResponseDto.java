@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class PostResponseDto {
+    private String id;
     private String title;
     private String content;
     private String url;
@@ -22,6 +23,7 @@ public class PostResponseDto {
 
     public static PostResponseDto convert(Post post) {
         return PostResponseDto.builder()
+                .id(post.getId())
                 .title(post.getTitle())
                 .content(post.getContent())
                 .url(post.getUrl())
