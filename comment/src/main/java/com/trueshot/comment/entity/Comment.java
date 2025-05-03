@@ -13,6 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Comment {
+
     @Id
     private UUID id;
 
@@ -21,6 +22,8 @@ public class Comment {
     private UUID userId;
 
     private String content;
+
+    private String url; // ADD THIS FIELD (image url)
 
     private LocalDateTime createdAt;
 }

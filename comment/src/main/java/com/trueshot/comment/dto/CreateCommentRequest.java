@@ -8,6 +8,6 @@ import java.util.UUID;
 public class CreateCommentRequest {
 
     private UUID postId;
-    private UUID userId;
     private String content;
+    private String imageContent; // ADD THIS (Base64 string)
 }

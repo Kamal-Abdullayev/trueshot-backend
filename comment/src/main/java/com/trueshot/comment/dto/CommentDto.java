@@ -13,6 +13,6 @@ public class CommentDto {
     private String postId;
     private String userId;
     private String content;
+    private String url;
     private LocalDateTime createdAt;
-
 }
