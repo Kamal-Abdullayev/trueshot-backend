@@ -1,6 +1,16 @@
 spring:
   application:
     name: media-process
+  datasource:
+    url: jdbc:postgresql://localhost:5432/trueshot_db
+    username: postgres
+    password: your_password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
 server:
   port: 8080
 
@@ -9,7 +19,6 @@ minio:
   access-key: test_user
   secret-key: test_password
   url: http://localhost:9000
-
 
 helper:
   app-ip: ${APP_IP:http://localhost}

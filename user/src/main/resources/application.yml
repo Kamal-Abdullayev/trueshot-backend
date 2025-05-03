@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: user
+
+server:
+  port: 8087
+
+application:
+  security:
+    jwt:
+      secret-key: p5VDU8b2L0uOi1TyJ1uyMZmkfXrZStDdp0Kb+7Ksmw0=
