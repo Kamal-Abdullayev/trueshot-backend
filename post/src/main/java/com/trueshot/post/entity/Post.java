@@ -27,6 +27,8 @@ public class Post {
     private String content;
     private String url;
 
+    private String userId;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

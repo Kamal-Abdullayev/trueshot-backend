@@ -1,30 +1,45 @@
 package com.trueshot.feed.service;
 
 import com.trueshot.feed.dto.PostResponseDto;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpMethod;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import com.trueshot.feed.dto.UserResponseDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class FeedService {
 
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
-    @Autowired
-    public FeedService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    public List<PostResponseDto> getUserFeed(String userId, String token) {
+        // 1. Fetch full UserResponseDto list
+        List<UserResponseDto> followedUsers = webClient.get()
+                .uri("http://localhost:8087/api/follow/following")
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<UserResponseDto>>() {})
+                .block();
 
-    // Fetch all posts from the Post microservice
-    public List<PostResponseDto> getFeed() {
-        String url = "http://localhost:8086/api/v1/post/all";  // Updated to port 8086
-        // Use ParameterizedTypeReference to ensure correct type deserialization
-        ResponseEntity<List<PostResponseDto>> response = restTemplate.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<List<PostResponseDto>>() {});
-        return response.getBody();
+        if (followedUsers == null || followedUsers.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 2. Extract just the UUIDs (not usernames)
+        List<String> followedUserIds = followedUsers.stream()
+                .map(UserResponseDto::getId)
+                .toList();
+
+        // 3. Fetch posts from Post microservice
+        return webClient.post()
+                .uri("http://localhost:8086/api/v1/post/by-user-ids")
+                .bodyValue(followedUserIds)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<PostResponseDto>>() {})
+                .block();
     }
 }

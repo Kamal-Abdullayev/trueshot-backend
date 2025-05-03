@@ -12,4 +12,6 @@ public class PostCreateRequestDto {
     private String content;
     private String imageContent;
 
+    private String userId;
+
 }
