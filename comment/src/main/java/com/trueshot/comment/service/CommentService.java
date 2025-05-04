@@ -2,6 +2,7 @@ package com.trueshot.comment.service;
 
 import com.trueshot.comment.dto.CommentDto;
 import com.trueshot.comment.dto.CreateCommentRequest;
+import com.trueshot.comment.dto.ImageSaveRequestDto;
 import com.trueshot.comment.entity.Comment;
 import com.trueshot.comment.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,7 @@ public class CommentService {
                 }
                 Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
                         .uri("http://localhost:8080/api/v1/image/upload")
-                        .bodyValue(new MediaProcessUploadImageRequestDto(
+                        .bodyValue(new ImageSaveRequestDto(
                                 request.getImageContent(),
                                 "image"
                         ))
@@ -46,6 +47,7 @@ public class CommentService {
                                 .postId(request.getPostId())
                                 .userId(userId)
                                 .content(request.getContent())
+                                .url(response.imagePath())
                                 .createdAt(LocalDateTime.now())
                                 .build();
 
@@ -69,7 +71,7 @@ public class CommentService {
                                                 .postId(comment.getPostId().toString())
                                                 .userId(comment.getUserId().toString())
                                                 .content(comment.getContent())
-                                                .url(null)
+                                                .url(comment.getUrl())
                                                 .createdAt(comment.getCreatedAt())
                                                 .build())
                                 .collect(Collectors.toList());
