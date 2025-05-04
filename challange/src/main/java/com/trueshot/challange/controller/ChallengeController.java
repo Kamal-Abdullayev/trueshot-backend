@@ -2,39 +2,37 @@ package com.trueshot.challange.controller;
 
 import com.trueshot.challange.entity.Challenge;
 import com.trueshot.challange.service.ChallengeService;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/challenge")
+@RequestMapping("/api/v1/challenges")
 public class ChallengeController {
 
     @Autowired
     private ChallengeService challengeService;
 
-    @GetMapping
-    public List<Challenge> getAllChallenges() {
-        return challengeService.getAllChallenges();
+    @PostMapping("/create")
+    public ResponseEntity<Challenge> createChallenge(@RequestBody CreateChallengeRequest request) {
+        Challenge challenge = challengeService.createChallenge(
+                request.getContent(),
+                request.getGroupId(),
+                request.getAdminId(),
+                request.getMemberIds()
+        );
+        return ResponseEntity.ok(challenge);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Challenge> getChallengeById(@PathVariable Long id) {
-        return challengeService.getChallengeById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @PostMapping
-    public Challenge createChallenge(@RequestBody Challenge challenge) {
-        return challengeService.createChallenge(challenge);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteChallenge(@PathVariable Long id) {
-        challengeService.deleteChallenge(id);
-        return ResponseEntity.noContent().build();
+    @Data
+    public static class CreateChallengeRequest {
+        private String content;
+        private UUID groupId;
+        private UUID adminId;
+        private Set<UUID> memberIds;
     }
 }
