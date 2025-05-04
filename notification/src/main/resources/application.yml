@@ -2,6 +2,16 @@ spring:
   application:
     name: notification
 
+  datasource:
+    url: jdbc:postgresql://localhost:5433/postgres
+    username: admin
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
 server:
   port: 8085
 
@@ -11,3 +21,13 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka
+
+application:
+  security:
+    jwt:
+      secret-key: p5VDU8b2L0uOi1TyJ1uyMZmkfXrZStDdp0Kb+7Ksmw0=  # Replace this with your actual JWT secret key
+
+logging:
+  level:
+    org.hibernate.SQL: info
+    org.hibernate.type.descriptor.sql: trace
