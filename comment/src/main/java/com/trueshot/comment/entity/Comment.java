@@ -23,7 +23,7 @@ public class Comment {
 
     private String content;
 
-    private String url; // ADD THIS FIELD (image url)
+    private String url;
 
     private LocalDateTime createdAt;
 }
