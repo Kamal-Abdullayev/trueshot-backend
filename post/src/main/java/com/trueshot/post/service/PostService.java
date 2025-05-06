@@ -17,8 +17,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class PostService {
+
     private final PostRepository postRepository;
-    private final WebClient webClient;
+    private final WebClient mediaServiceWebClient; // renamed to use the correct bean
 
     public List<PostResponseDto> getAllPosts(Pageable pageable) {
         return postRepository.findAll(pageable).stream()
@@ -41,9 +42,9 @@ public class PostService {
 
     @Transactional
     public PostResponseDto savePost(PostCreateRequestDto postCreateRequestDto) {
-        // Upload the image
-        Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
-                .uri("http://localhost:8080/api/v1/image/upload")
+        // Upload the image to the media service
+        Mono<MediaProcessUploadImageResponseDto> responseMono = mediaServiceWebClient.post()
+                .uri("/api/v1/image/upload")
                 .bodyValue(new MediaProcessUploadImageRequestDto(
                         postCreateRequestDto.getImageContent(),
                         "image"
@@ -94,5 +95,4 @@ public class PostService {
                 .map(PostResponseDto::convert)
                 .toList();
     }
-
 }

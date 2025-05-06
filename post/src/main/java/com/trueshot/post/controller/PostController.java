@@ -21,8 +21,7 @@ public class PostController {
 
     private final PostService postService;
     private final JwtService jwtService;
-    private final WebClient webClient;
-
+    private final WebClient userServiceWebClient; // injected bean with base URL
 
     @GetMapping("/{id}")
     public ResponseEntity<PostResponseDto> getPostById(@PathVariable String id) {
@@ -40,14 +39,14 @@ public class PostController {
                                                       @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
         String username = jwtService.extractUsername(token);
-        String userId = webClient.get()
-                .uri("http://localhost:8087/api/auth/user/id-by-username?username=" + username)
+
+        String userId = userServiceWebClient.get()
+                .uri("/api/v1/auth/user/id-by-username?username=" + username)
                 .retrieve()
                 .bodyToMono(String.class)
                 .block();
 
         post.setUserId(userId);
-
         return new ResponseEntity<>(postService.savePost(post), HttpStatus.CREATED);
     }
 
@@ -66,6 +65,4 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getPostsByUserIds(@RequestBody List<String> userIds) {
         return ResponseEntity.ok(postService.getPostsByUserIds(userIds));
     }
-
-
 }
