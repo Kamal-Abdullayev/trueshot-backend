@@ -1,22 +1,24 @@
+server:
+  port: 8090
+
 spring:
   application:
     name: api-gateway
   cloud:
     gateway:
       routes:
-        - id: user
+        - id: user-auth
           uri: lb://user
           predicates:
             - Path=/api/v1/auth/**
+        - id: user-follow
+          uri: lb://user
+          predicates:
             - Path=/api/v1/follow/**
         - id: post
           uri: lb://post
           predicates:
             - Path=/api/v1/post/**
-        #        - id: notification
-        #          uri: lb://notification
-        #          predicates:
-        #            - Path=/api/v1/.../**
         - id: media-process
           uri: lb://media-process
           predicates:
@@ -25,22 +27,15 @@ spring:
           uri: lb://feed
           predicates:
             - Path=/api/v1/feed/**
-        #        - id: comment
-        #          uri: lb://comment
-        #          predicates:
-        #            - Path=/api/v1/.../**
         - id: challenge
           uri: lb://challenge
           predicates:
             - Path=/api/v1/challenge/**
+
       discovery:
         locator:
           enabled: true
           lowerCaseServiceId: true
-
-
-server:
-  port: 8090
 
 eureka:
   client:
