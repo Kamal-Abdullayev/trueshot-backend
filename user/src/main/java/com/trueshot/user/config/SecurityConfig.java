@@ -86,19 +86,46 @@ public class SecurityConfig {
     }
 
     // You need this to deactivate the cors issue
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080")); // or add * to allow all origins
-        configuration.setAllowCredentials(true);
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // to set
-                                                                                                            // allowed
-                                                                                                            // http
-                                                                                                            // methods
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setExposedHeaders(Arrays.asList("custom-header1", "custom-header2"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+
+
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        // Allow both development servers
+//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:5173", "http://localhost:8090"));
+//        configuration.setAllowCredentials(true);
+//
+//        // All necessary HTTP methods
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+//
+//        // Essential headers for authentication and content
+//        configuration.setAllowedHeaders(Arrays.asList(
+//                "Authorization",
+//                "Cache-Control",
+//                "Content-Type",
+//                "Accept",
+//                "Origin",
+//                "X-Requested-With",
+//                "Access-Control-Request-Method",
+//                "Access-Control-Request-Headers"
+//        ));
+//
+//        // Headers that should be exposed to the client
+//        configuration.setExposedHeaders(Arrays.asList(
+//                "Authorization",
+//                "Content-Type",
+//                "X-Requested-With",
+//                "Accept",
+//                "Origin",
+//                "Access-Control-Allow-Origin",
+//                "Access-Control-Allow-Credentials"
+//        ));
+//
+//        // Set max age for preflight requests
+//        configuration.setMaxAge(3600L);
+//
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 }

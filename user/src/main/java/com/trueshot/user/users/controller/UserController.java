@@ -54,9 +54,13 @@ public class UserController {
         // If the user is authenticated we generate the token, otherwise, we throw an
         // exception
 
+        log.info("User authenticated successfully: {}", userDto.getName());
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(userDto.getName());
+            String token = jwtService.generateToken(userDto.getName());
+            log.info("Token: {}", token);
+            return token;
         } else {
+            log.error("User already authenticated: {}", userDto.getName());
             throw new UsernameNotFoundException("The user cannot be authenticated");
         }
     }
