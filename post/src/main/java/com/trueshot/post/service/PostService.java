@@ -3,8 +3,10 @@ package com.trueshot.post.service;
 import com.trueshot.post.dto.*;
 import com.trueshot.post.entity.Post;
 import com.trueshot.post.exception.ResourceNotFoundException;
+import com.trueshot.post.jwt.JwtService;
 import com.trueshot.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,15 +16,31 @@ import reactor.core.publisher.Mono;
 import java.security.InvalidParameterException;
 import java.util.List;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class PostService {
 
     private final PostRepository postRepository;
     private final WebClient mediaServiceWebClient; // renamed to use the correct bean
+    private final JwtService jwtService;
+    private final WebClient userServiceWebClient; // injected bean with base URL
 
-    public List<PostResponseDto> getAllPosts(Pageable pageable) {
-        return postRepository.findAll(pageable).stream()
+    public List<PostResponseDto> getAllPosts(Pageable pageable, String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        String username = jwtService.extractUsername(token);
+
+        String userId = userServiceWebClient.get()
+                .uri("/api/v1/auth/user/id-by-username?username=" + username)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        log.info("Find all post by user ID: {}", userId);
+
+        return postRepository.findAllPostsByUserId(userId, pageable).orElseThrow(
+                () -> new ResourceNotFoundException("Posts not found")
+                ).stream()
                 .map(PostResponseDto::convert)
                 .toList();
     }
@@ -85,8 +103,10 @@ public class PostService {
     }
 
     public void deletePost(String postId) {
-        Post dbPost = getPostObjectById(postId);
-        postRepository.delete(dbPost);
+        if (postId == null || postId.isEmpty()) {
+            throw new InvalidParameterException("Invalid post id");
+        }
+        postRepository.deleteById(postId);
     }
 
     public List<PostResponseDto> getPostsByUserIds(List<String> userIds) {

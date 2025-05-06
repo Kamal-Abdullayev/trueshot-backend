@@ -29,9 +29,10 @@ public class PostController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(name = "page", defaultValue = "0") int page,
-                                                             @RequestParam(name = "size", defaultValue = "5") int size) {
-        return new ResponseEntity<>(postService.getAllPosts(PageRequest.of(page, size)), HttpStatus.OK);
+        public ResponseEntity<List<PostResponseDto>> getAllPosts(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                             @RequestParam(name = "size", defaultValue = "5") int size,
+                                                                 @RequestHeader("Authorization") String authHeader) {
+        return new ResponseEntity<>(postService.getAllPosts(PageRequest.of(page, size), authHeader), HttpStatus.OK);
     }
 
     @PostMapping
