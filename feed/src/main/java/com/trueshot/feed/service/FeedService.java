@@ -33,7 +33,7 @@ public class FeedService {
         if (followedUsers != null && !followedUsers.isEmpty()) {
             // Add followed users' IDs
             followedUsers.stream()
-                    .map(UserResponseDto::getId)
+                .map(UserResponseDto::getId)
                     .forEach(userIds::add);
         }
 

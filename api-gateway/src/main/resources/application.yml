@@ -31,6 +31,14 @@ spring:
           uri: lb://challenge
           predicates:
             - Path=/api/v1/challenge/**
+        - id: notification
+          uri: lb://notification
+          predicates:
+            - Path=/api/v1/notifications/**
+        - id: groups
+          uri: lb://user
+          predicates:
+            - Path=/api/v1/groups/**
 
       discovery:
         locator:

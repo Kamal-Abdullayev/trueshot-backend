@@ -7,6 +7,7 @@ import com.trueshot.user.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -36,5 +37,9 @@ public class GroupService {
                 .build();
 
         return groupRepository.save(group);
+    }
+
+    public List<Group> getAllGroups() {
+        return groupRepository.findAll();
     }
 }
