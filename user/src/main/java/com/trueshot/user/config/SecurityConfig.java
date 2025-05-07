@@ -51,23 +51,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/**").permitAll()
-                        // .requestMatchers("/api/auth/public", "/api/auth/signup",
-                        // "/api/auth/authenticate").permitAll()
-                        // .requestMatchers("/api/auth/admin").hasAuthority("ADMIN")
-                        // .requestMatchers("/api/auth/user").hasAuthority("USER")
+                        .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/signup").permitAll()
+                        .requestMatchers("/api/v1/**").authenticated()
                         .anyRequest().authenticated())
-                // Enabling the session manager to control the session
-                .sessionManagement()
-                // .sessionManagement((session) ->
-                // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-                // .STATELESS prevents the request from being saved in the session.
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                // Defining our authenticationProvider
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
-                // We are telling Spring Boot to check authFilter first, then, check the
-                // UsernamePasswordAuthenticationFilter
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
@@ -85,47 +74,35 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-    // You need this to deactivate the cors issue
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:5173", "http://localhost:8090"));
+        configuration.setAllowCredentials(true);
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Cache-Control",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "X-Requested-With",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials"
+        ));
+        configuration.setMaxAge(3600L);
 
-
-//    @Bean
-//    public CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-//        // Allow both development servers
-//        configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:5173", "http://localhost:8090"));
-//        configuration.setAllowCredentials(true);
-//
-//        // All necessary HTTP methods
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-//
-//        // Essential headers for authentication and content
-//        configuration.setAllowedHeaders(Arrays.asList(
-//                "Authorization",
-//                "Cache-Control",
-//                "Content-Type",
-//                "Accept",
-//                "Origin",
-//                "X-Requested-With",
-//                "Access-Control-Request-Method",
-//                "Access-Control-Request-Headers"
-//        ));
-//
-//        // Headers that should be exposed to the client
-//        configuration.setExposedHeaders(Arrays.asList(
-//                "Authorization",
-//                "Content-Type",
-//                "X-Requested-With",
-//                "Accept",
-//                "Origin",
-//                "Access-Control-Allow-Origin",
-//                "Access-Control-Allow-Credentials"
-//        ));
-//
-//        // Set max age for preflight requests
-//        configuration.setMaxAge(3600L);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//        return source;
-//    }
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
+    }
 }

@@ -6,10 +6,11 @@ import com.trueshot.user.users.repository.GroupRepository;
 import com.trueshot.user.users.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 public class GroupService {
@@ -24,16 +25,10 @@ public class GroupService {
         User admin = userRepository.findByName(adminUsername)
                 .orElseThrow(() -> new RuntimeException("Admin user not found"));
 
-        // Only allow users where role is not ADMIN
-        Set<User> members = userRepository.findAll().stream()
-                .filter(u -> !u.getName().equals(adminUsername))
-                .filter(u -> !"ADMIN".equalsIgnoreCase(u.getRoles()))
-                .collect(Collectors.toSet());
-
         Group group = Group.builder()
                 .name(name)
                 .admin(admin)
-                .members(members)
+                .members(Set.of()) // Create empty group
                 .build();
 
         return groupRepository.save(group);
@@ -41,5 +36,56 @@ public class GroupService {
 
     public List<Group> getAllGroups() {
         return groupRepository.findAll();
+    }
+
+    @Transactional
+    public Group joinGroup(UUID groupId, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (group.getMembers().contains(user)) {
+            throw new RuntimeException("User is already a member of this group");
+        }
+
+        group.getMembers().add(user);
+        return groupRepository.save(group);
+    }
+
+    @Transactional
+    public Group leaveGroup(UUID groupId, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getMembers().contains(user)) {
+            throw new RuntimeException("User is not a member of this group");
+        }
+
+        if (group.getAdmin().equals(user)) {
+            throw new RuntimeException("Admin cannot leave the group. Transfer admin rights first.");
+        }
+
+        group.getMembers().remove(user);
+        return groupRepository.save(group);
+    }
+
+    @Transactional
+    public void deleteGroup(UUID groupId, String username) {
+        Group group = groupRepository.findById(groupId)
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+        
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!group.getAdmin().equals(user)) {
+            throw new RuntimeException("Only the admin can delete the group");
+        }
+
+        groupRepository.delete(group);
     }
 }
