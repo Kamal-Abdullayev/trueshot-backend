@@ -85,6 +85,11 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
+    // an end point for getting all users
+    @GetMapping("/users")
+    public List<User> getAllUsers(Authentication authentication) {
+        return userService.getAllUsersExceptCurrent(authentication.getName());
+    }
 
 
 

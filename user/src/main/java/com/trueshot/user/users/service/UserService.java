@@ -5,8 +5,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.List;
-
-
+import java.util.stream.Collectors;
 
 import com.trueshot.user.users.model.User;
 import com.trueshot.user.users.repository.UserRepository;
@@ -42,7 +41,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
-
-
+    public List<User> getAllUsersExceptCurrent(String currentUsername) {
+        return userRepository.findAll().stream()
+                .filter(user -> !user.getName().equals(currentUsername))
+                .collect(Collectors.toList());
+    }
 
 }

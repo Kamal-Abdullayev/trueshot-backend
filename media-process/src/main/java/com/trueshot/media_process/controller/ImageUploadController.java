@@ -19,8 +19,15 @@ public class ImageUploadController {
     private final ImageUploadService imageUploadService;
 
     @PostMapping("/upload")
-    public ResponseEntity<ImageListResponseDto> uploadImage(@RequestBody ImageSaveRequestDto imageSaveRequestDto) {
-        return new ResponseEntity<>(imageUploadService.saveImage(imageSaveRequestDto), HttpStatus.CREATED);
+    public ResponseEntity<?> uploadImage(@RequestBody ImageSaveRequestDto imageSaveRequestDto) {
+        try {
+            ImageListResponseDto response = imageUploadService.saveImage(imageSaveRequestDto);
+            return new ResponseEntity<>(response, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{folderPath}/{imageName}")
@@ -32,6 +39,5 @@ public class ImageUploadController {
                 .contentType(MediaType.IMAGE_JPEG)
                 .contentLength(imageResponseDto.getContentLength())
                 .body(imageResponseDto.getByteArrayResource());
-
     }
 }
