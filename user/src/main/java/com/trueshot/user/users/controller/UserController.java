@@ -57,7 +57,7 @@ public class UserController {
         log.info("User authenticated successfully: {}", userDto.getName());
         if (authentication.isAuthenticated()) {
             String token = jwtService.generateToken(userDto.getName());
-            log.info("Token: {}", token);
+            log.debug("Token: {}", token);
             return token;
         } else {
             log.error("User already authenticated: {}", userDto.getName());
