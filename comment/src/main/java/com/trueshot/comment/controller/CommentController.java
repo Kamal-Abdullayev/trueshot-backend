@@ -18,16 +18,20 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentDto> createComment(@RequestBody CreateCommentRequest request,
+    public ResponseEntity<?> createComment(@RequestBody CreateCommentRequest request,
                                                     @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal userPrincipal) {
-
         if (userPrincipal == null) {
             return ResponseEntity.status(401).build();
         }
 
-        CommentDto savedComment = commentService.createComment(request, userPrincipal.getId());
-
-        return ResponseEntity.ok(savedComment);
+        try {
+            CommentDto savedComment = commentService.createComment(request, userPrincipal.getId());
+            return ResponseEntity.ok(savedComment);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
     }
 
     @GetMapping("/post/{postId}")

@@ -57,7 +57,7 @@ public class UserController {
         log.info("User authenticated successfully: {}", userDto.getName());
         if (authentication.isAuthenticated()) {
             String token = jwtService.generateToken(userDto.getName());
-            log.info("Token: {}", token);
+            log.debug("Token: {}", token);
             return token;
         } else {
             log.error("User already authenticated: {}", userDto.getName());
@@ -85,6 +85,11 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
+    // an end point for getting all users
+    @GetMapping("/users")
+    public List<User> getAllUsers(Authentication authentication) {
+        return userService.getAllUsersExceptCurrent(authentication.getName());
+    }
 
 
 

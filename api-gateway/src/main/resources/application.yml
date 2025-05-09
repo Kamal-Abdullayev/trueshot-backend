@@ -39,6 +39,15 @@ spring:
           uri: lb://user
           predicates:
             - Path=/api/v1/groups/**
+        - id: comment-list
+          uri: lb://comment
+          predicates:
+            - Path=/api/v1/comments/post/**
+
+        - id: comment-create
+          uri: lb://comment
+          predicates:
+            - Path=/api/v1/comments
 
       discovery:
         locator:
