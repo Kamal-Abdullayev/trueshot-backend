@@ -1,5 +1,6 @@
 package com.trueshot.post.service;
 
+import com.trueshot.post.constant.KafkaConfigConstant;
 import com.trueshot.post.dto.*;
 import com.trueshot.post.entity.Post;
 import com.trueshot.post.exception.ResourceNotFoundException;
@@ -8,6 +9,7 @@ import com.trueshot.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -22,9 +24,12 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
-    private final WebClient mediaServiceWebClient; // renamed to use the correct bean
+    private final WebClient mediaServiceWebClient;
     private final JwtService jwtService;
-    private final WebClient userServiceWebClient; // injected bean with base URL
+    private final WebClient userServiceWebClient;
+    private final KafkaTemplate<String, Object> kafkaTemplate;
+    private final KafkaConfigConstant configConstant;
+
 
     public List<PostResponseDto> getAllPosts(Pageable pageable, String authHeader) {
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
@@ -59,7 +64,7 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponseDto savePost(PostCreateRequestDto postCreateRequestDto) {
+    public PostCreateResponseDto savePost(PostCreateRequestDto postCreateRequestDto) {
         // Upload the image to the media service
         Mono<MediaProcessUploadImageResponseDto> responseMono = mediaServiceWebClient.post()
                 .uri("/api/v1/image/upload")
@@ -83,7 +88,15 @@ public class PostService {
                 .userId(postCreateRequestDto.getUserId())
                 .build();
 
-        return PostResponseDto.convert(postRepository.save(post));
+        Post savedPost = postRepository.save(post);
+        log.info("Post saved to database: {}", savedPost);
+
+        PostCreateResponseDto responseDto = PostCreateResponseDto.convert(savedPost);
+
+        kafkaTemplate.send(configConstant.getPostPublishTopic(), responseDto);
+        log.info("Post with id {} published to {} ", savedPost.getId(), configConstant.getPostPublishTopic());
+
+        return responseDto;
     }
 
     public PostResponseDto updatePost(String postId, PostUpdateDto postUpdateDto) {

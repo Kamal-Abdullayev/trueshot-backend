@@ -39,7 +39,7 @@ public class CommentService {
 
                 if (request.getImageContent() != null && !request.getImageContent().isBlank()) {
                         Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
-                                .uri("http://localhost:8080/api/v1/image/upload")
+                                .uri("http://localhost:8090/api/v1/image/upload")
                                 .bodyValue(new ImageSaveRequestDto(
                                         request.getImageContent(),
                                         "image"

@@ -2,7 +2,7 @@ spring:
   application:
     name: challenge
 server:
-  port: 8081
+  port: 8084
 
 eureka:
   instance:
