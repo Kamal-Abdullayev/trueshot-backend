@@ -1,6 +1,7 @@
 package com.trueshot.post.controller;
 
 import com.trueshot.post.dto.PostCreateRequestDto;
+import com.trueshot.post.dto.PostCreateResponseDto;
 import com.trueshot.post.dto.PostResponseDto;
 import com.trueshot.post.dto.PostUpdateDto;
 import com.trueshot.post.jwt.JwtService;
@@ -36,8 +37,8 @@ public class PostController {
     }
 
     @PostMapping
-    public ResponseEntity<PostResponseDto> createPost(@RequestBody PostCreateRequestDto post,
-                                                      @RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<PostCreateResponseDto> createPost(@RequestBody PostCreateRequestDto post,
+                                                            @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
         String username = jwtService.extractUsername(token);
 

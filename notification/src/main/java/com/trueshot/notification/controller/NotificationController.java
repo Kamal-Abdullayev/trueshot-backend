@@ -1,5 +1,6 @@
 package com.trueshot.notification.controller;
 
+import com.trueshot.notification.dto.NotificationDTO;
 import com.trueshot.notification.entity.Notification;
 import com.trueshot.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +8,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
@@ -17,10 +17,9 @@ public class NotificationController {
     private final NotificationService service;
 
     @PostMapping
-    public ResponseEntity<Notification> createNotification(
-            @RequestParam String userId,
-            @RequestParam String message) {
-        return ResponseEntity.ok(service.createNotification(userId, message));
+    public ResponseEntity<Notification> createNotification(@RequestBody NotificationDTO notificationDTO) {
+        return ResponseEntity.ok(service.createNotification(
+                notificationDTO.getUserId(), notificationDTO.getMessage()));
     }
 
     @GetMapping("/user/{userId}")
@@ -44,5 +43,4 @@ public class NotificationController {
         int updatedCount = service.markAllAsRead(userId);
         return ResponseEntity.ok(updatedCount + " notifications marked as read.");
     }
-
 }

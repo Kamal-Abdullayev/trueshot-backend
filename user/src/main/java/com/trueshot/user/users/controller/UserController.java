@@ -1,6 +1,5 @@
 package com.trueshot.user.users.controller;
 
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -61,7 +60,7 @@ public class UserController {
     }
 
     @GetMapping("/user/ids")
-    public List<UUID> getAllUserIds() {
+    public List<String> getAllUserIds() {
         return userService.getAllUsers()
                 .stream()
                 .map(User::getId)

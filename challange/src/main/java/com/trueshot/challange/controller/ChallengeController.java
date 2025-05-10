@@ -1,38 +1,41 @@
 package com.trueshot.challange.controller;
 
+import com.trueshot.challange.dto.ChallengeListResponseDto;
+import com.trueshot.challange.dto.ChallengeResponseDto;
+import com.trueshot.challange.dto.CreateChallengeRequestDto;
 import com.trueshot.challange.entity.Challenge;
 import com.trueshot.challange.service.ChallengeService;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
+import org.apache.catalina.LifecycleState;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Set;
-import java.util.UUID;
+import java.util.List;
 
+@RequiredArgsConstructor(onConstructor_ = {@Autowired})
 @RestController
-@RequestMapping("/api/v1/challenges")
+@RequestMapping("/api/v1/challenge")
 public class ChallengeController {
 
-    @Autowired
-    private ChallengeService challengeService;
+    private final ChallengeService challengeService;
 
-    @PostMapping("/create")
-    public ResponseEntity<Challenge> createChallenge(@RequestBody CreateChallengeRequest request) {
-        Challenge challenge = challengeService.createChallenge(
-                request.getContent(),
-                request.getGroupId(),
-                request.getAdminId(),
-                request.getMemberIds()
-        );
-        return ResponseEntity.ok(challenge);
+    @PostMapping
+    public ResponseEntity<ChallengeResponseDto> createChallenge(@RequestBody CreateChallengeRequestDto createChallengeRequestDto,
+                                                                @RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(challengeService.createChallenge(createChallengeRequestDto, authHeader));
     }
 
-    @Data
-    public static class CreateChallengeRequest {
-        private String content;
-        private UUID groupId;
-        private UUID adminId;
-        private Set<UUID> memberIds;
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ChallengeListResponseDto>> getAllChallenges(@RequestParam(name = "page", defaultValue = "0") int page,
+                                                                           @RequestParam(name = "size", defaultValue = "5") int size) {
+
+        return ResponseEntity.ok(challengeService.retrieveAllChallengeList(PageRequest.of(page, size)));
+
     }
+
+
 }

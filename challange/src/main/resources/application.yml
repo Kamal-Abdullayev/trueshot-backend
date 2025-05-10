@@ -2,7 +2,7 @@ spring:
   application:
     name: challenge
 server:
-  port: 8081
+  port: 8091
 
 eureka:
   instance:
@@ -10,4 +10,9 @@ eureka:
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka
+
+application:
+  security:
+    jwt:
+      secret-key: p5VDU8b2L0uOi1TyJ1uyMZmkfXrZStDdp0Kb+7Ksmw0=
 

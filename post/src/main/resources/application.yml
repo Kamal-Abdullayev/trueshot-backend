@@ -13,6 +13,13 @@ spring:
     hibernate:
       ddl-auto: update
 
+  kafka:
+    bootstrap-servers: http://localhost:9092
+    schema-registry-url: http://localhost:8081
+    request-timeout-ms: 3000
+    max-block-ms: 3000
+    post-publish-topic: trueshot.recent-activities.post
+
 server:
   port: 8086
 

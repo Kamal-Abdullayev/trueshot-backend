@@ -10,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class GroupService {
@@ -39,7 +38,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Group joinGroup(UUID groupId, String username) {
+    public Group joinGroup(String groupId, String username) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
         
@@ -55,7 +54,7 @@ public class GroupService {
     }
 
     @Transactional
-    public Group leaveGroup(UUID groupId, String username) {
+    public Group leaveGroup(String groupId, String username) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
         
@@ -75,7 +74,7 @@ public class GroupService {
     }
 
     @Transactional
-    public void deleteGroup(UUID groupId, String username) {
+    public void deleteGroup(String groupId, String username) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
         

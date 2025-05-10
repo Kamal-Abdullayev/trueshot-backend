@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Builder
 @Entity
@@ -15,11 +14,12 @@ import java.util.UUID;
 public class Comment {
 
     @Id
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
-    private UUID postId;
+    private String postId;
 
-    private UUID userId;
+    private String userId;
 
     private String content;
 

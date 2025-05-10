@@ -17,7 +17,7 @@ public class WebClientConfig {
     @Bean
     public WebClient mediaServiceWebClient(WebClient.Builder builder) {
         return builder
-                .baseUrl("http://localhost:8080")
+                .baseUrl("http://localhost:8090")
                 .build();
     }
 }

@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -30,7 +29,7 @@ public class UserFollowController {
     @Operation(summary = "Follow a user")
     @PostMapping("/follow/{followingId}")
     @Transactional
-    public ResponseEntity<String> followUser(Authentication authentication, @PathVariable UUID followingId) {
+    public ResponseEntity<String> followUser(Authentication authentication, @PathVariable String followingId) {
         User follower = userRepository.findByName(authentication.getName()).orElseThrow();
         User following = userRepository.findById(followingId).orElseThrow();
 
@@ -50,7 +49,7 @@ public class UserFollowController {
     @Operation(summary = "Unfollow a user")
     @PostMapping("/unfollow/{followingId}")
     @Transactional
-    public ResponseEntity<String> unfollowUser(Authentication authentication, @PathVariable UUID followingId) {
+    public ResponseEntity<String> unfollowUser(Authentication authentication, @PathVariable String followingId) {
         User follower = userRepository.findByName(authentication.getName()).orElseThrow();
         User following = userRepository.findById(followingId).orElseThrow();
 

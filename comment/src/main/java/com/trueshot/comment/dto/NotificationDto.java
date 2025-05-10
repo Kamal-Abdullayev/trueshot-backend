@@ -1,4 +1,4 @@
-package com.trueshot.notification.dto;
+package com.trueshot.comment.dto;
 
 import lombok.*;
 
@@ -6,7 +6,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NotificationDTO {
+public class NotificationDto {
     private String userId;
     private String message;
 }

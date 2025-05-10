@@ -3,7 +3,7 @@ spring:
     name: media-process
 
 server:
-  port: 8080
+  port: 8081
 
 minio:
   bucket-name: true-shot-media
@@ -13,7 +13,7 @@ minio:
 
 helper:
   app-ip: ${APP_IP:http://localhost}
-  base-url: ${helper.app-ip}:${server.port}
+  base-url: ${helper.app-ip}:8090
   image-folder-path: /api/v1/image
 
 eureka:

@@ -1,20 +1,18 @@
 package com.trueshot.user.users.dto;
 
 import com.trueshot.user.users.model.Group;
-import com.trueshot.user.users.model.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupDto {
-    private UUID id;
+    private String id;
     private String name;
     private UserDto admin;
     private Set<UserDto> members;
