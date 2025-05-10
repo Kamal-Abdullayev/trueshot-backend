@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Service

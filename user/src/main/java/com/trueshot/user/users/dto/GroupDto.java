@@ -22,7 +22,7 @@ public class GroupDto {
         dto.setId(group.getId());
         dto.setName(group.getName());
         dto.setAdmin(UserDto.fromUser(group.getAdmin()));
-        dto.setMembers(group.getMembers().stream()
+        dto.setMembers(group.getUserList().stream()
                 .map(UserDto::fromUser)
                 .collect(Collectors.toSet()));
         return dto;

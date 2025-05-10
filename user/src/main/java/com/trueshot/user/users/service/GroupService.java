@@ -4,21 +4,19 @@ import com.trueshot.user.users.model.Group;
 import com.trueshot.user.users.model.User;
 import com.trueshot.user.users.repository.GroupRepository;
 import com.trueshot.user.users.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
+@RequiredArgsConstructor
 @Service
 public class GroupService {
 
-    @Autowired
-    private GroupRepository groupRepository;
-
-    @Autowired
-    private UserRepository userRepository;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
 
     public Group createGroup(String name, String adminUsername) {
         User admin = userRepository.findByName(adminUsername)
@@ -27,7 +25,7 @@ public class GroupService {
         Group group = Group.builder()
                 .name(name)
                 .admin(admin)
-                .members(Set.of()) // Create empty group
+                .userList(new ArrayList<>())
                 .build();
 
         return groupRepository.save(group);
@@ -45,11 +43,11 @@ public class GroupService {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (group.getMembers().contains(user)) {
+        if (group.getUserList().contains(user)) {
             throw new RuntimeException("User is already a member of this group");
         }
 
-        group.getMembers().add(user);
+        group.getUserList().add(user);
         return groupRepository.save(group);
     }
 
@@ -61,7 +59,7 @@ public class GroupService {
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!group.getMembers().contains(user)) {
+        if (!group.getUserList().contains(user)) {
             throw new RuntimeException("User is not a member of this group");
         }
 
@@ -69,7 +67,7 @@ public class GroupService {
             throw new RuntimeException("Admin cannot leave the group. Transfer admin rights first.");
         }
 
-        group.getMembers().remove(user);
+        group.getUserList().remove(user);
         return groupRepository.save(group);
     }
 

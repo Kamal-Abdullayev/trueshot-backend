@@ -66,6 +66,7 @@ public class CommentService {
                                 .bodyToMono(PostResponse.class)
                                 .map(PostResponse::userId)
                                 .block();
+                        log.info("Post owner ID: {}", postOwnerId);
                 } catch (WebClientResponseException e) {
                         log.error("Failed to fetch post owner: {}", e.getMessage());
                 }
