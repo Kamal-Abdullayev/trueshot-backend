@@ -1,14 +1,10 @@
 package com.trueshot.notification.controller;
 
-import com.trueshot.notification.dto.NotificationDTO;
 import com.trueshot.notification.entity.Notification;
-import com.trueshot.notification.jwt.JwtService;
-import com.trueshot.notification.scheduler.DailyChallengeScheduler;
 import com.trueshot.notification.service.NotificationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,34 +15,34 @@ import java.util.UUID;
 public class NotificationController {
 
     private final NotificationService service;
-    private final DailyChallengeScheduler dailyChallengeScheduler;
-    private final JwtService jwtService;
-    private final WebClient webClient;
-
-    @GetMapping("/test-daily-challenge")
-    public ResponseEntity<Void> testDailyChallenge() {
-        dailyChallengeScheduler.sendChallengeNotificationToAllUsers();
-        return ResponseEntity.ok().build();
-    }
 
     @PostMapping
-    public ResponseEntity<Void> createNotification(@RequestBody NotificationDTO dto) {
-        service.sendNotification(dto);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Notification> createNotification(
+            @RequestParam String userId,
+            @RequestParam String message) {
+        return ResponseEntity.ok(service.createNotification(userId, message));
     }
 
-    @GetMapping
-    public ResponseEntity<List<Notification>> getUserNotifications(@RequestHeader("Authorization") String authHeader) {
-        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-        String username = jwtService.extractUsername(token);
-        
-        // Get user ID from user service
-        String userId = webClient.get()
-                .uri("http://localhost:8087/api/v1/auth/user/id-by-username?username=" + username)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-                
-        return ResponseEntity.ok(service.getNotificationsForUser(UUID.fromString(userId)));
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Notification>> getUserNotifications(@PathVariable String userId) {
+        return ResponseEntity.ok(service.getNotifications(userId));
     }
+
+    @PutMapping("/{id}/read")
+    public ResponseEntity<Notification> markAsRead(@PathVariable Long id) {
+        return ResponseEntity.ok(service.markAsRead(id));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteNotification(@PathVariable Long id) {
+        service.deleteNotification(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/user/{userId}/read")
+    public ResponseEntity<String> markAllAsRead(@PathVariable String userId) {
+        int updatedCount = service.markAllAsRead(userId);
+        return ResponseEntity.ok(updatedCount + " notifications marked as read.");
+    }
+
 }

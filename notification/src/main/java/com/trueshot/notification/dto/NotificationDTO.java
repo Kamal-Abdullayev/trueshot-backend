@@ -8,6 +8,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class NotificationDTO {
-    private UUID userId;
+    private String userId;
     private String message;
 }

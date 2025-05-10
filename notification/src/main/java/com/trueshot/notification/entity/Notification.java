@@ -17,7 +17,7 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private UUID userId;
+    private String userId;
     private String message;
     private boolean isRead;
     private LocalDateTime timestamp;

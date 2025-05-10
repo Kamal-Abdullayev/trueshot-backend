@@ -7,6 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -18,7 +19,6 @@ import com.trueshot.user.users.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-// @CrossOrigin(origins = "http://localhost:8080/") //@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class UserController {
@@ -32,40 +32,23 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    // a new end-point that allows users to authenticate themselves and generate the
-    // jwt token
-    // This endpoint will receive the userDto, authenticate her/him with existing
-    // users in the database, then if authenticated, it will create the jwt
     @PostMapping("/authenticate")
     public String authenticateAndGetToken(@RequestBody UserDto userDto) {
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(userDto.getName(), userDto.getPassword()));
 
-        // authenticationManager.authenticate attempts to authenticate the passed
-        // Authentication object, returning a fully populated Authentication object
-        // (including granted authorities) if successful.
-        // UsernamePasswordAuthenticationToken can be used by the authenticationManager
-        // and we are passing the user name and password to it.
-        // To use the authenticationManager, you need to define a Bean for it, check
-        // SecurityConfig.java, it is defined there.
-        // Note that verifying the user is a required before generating the token,
-        // otherwise, we will be generating tokens for users that we cannot authenticate
-
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(userDto.getName(), userDto.getPassword()));
-        // If the user is authenticated we generate the token, otherwise, we throw an
-        // exception
-
-        log.info("User authenticated successfully: {}", userDto.getName());
         if (authentication.isAuthenticated()) {
-            String token = jwtService.generateToken(userDto.getName());
-            log.debug("Token: {}", token);
+            User user = userService.getUserByUsername(userDto.getName());
+            String token = jwtService.generateToken(user.getId().toString(), userDto.getName()); // Include userId in token
+            log.info("User authenticated successfully: {}", userDto.getName());
+            log.info("Generated Token: {}", token);
             return token;
         } else {
-            log.error("User already authenticated: {}", userDto.getName());
+            log.error("Failed to authenticate user: {}", userDto.getName());
             throw new UsernameNotFoundException("The user cannot be authenticated");
         }
     }
 
-    // an end point for signing up new users
     @PostMapping("/signup")
     public User signupUser(@RequestBody User user) {
         return userService.addUser(user);
@@ -85,13 +68,8 @@ public class UserController {
                 .collect(Collectors.toList());
     }
 
-    // an end point for getting all users
     @GetMapping("/users")
     public List<User> getAllUsers(Authentication authentication) {
         return userService.getAllUsersExceptCurrent(authentication.getName());
     }
-
-
-
-
 }
