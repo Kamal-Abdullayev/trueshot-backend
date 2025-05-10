@@ -3,7 +3,6 @@ package com.trueshot.comment.dto;
 import com.trueshot.comment.model.CommentReaction;
 import lombok.*;
 
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,7 +11,7 @@ import java.util.UUID;
 @Builder
 public class CreateCommentDto {
 
-    private UUID postId;
+    private String postId;
     private CommentReaction reaction;
     private String imageContent;
 }

@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class CommentService {
         private final CommentRepository commentRepository;
         private final WebClient webClient;
 
-        public CommentDto createComment(CreateCommentRequest request, UUID userId) {
+        public CommentDto createComment(CreateCommentRequest request, String userId) {
                 if (request.getImageContent() == null || request.getImageContent().isBlank()) {
                         throw new IllegalArgumentException("Image is required for comments.");
                 }
@@ -50,7 +49,6 @@ public class CommentService {
                 imageUrl = response.imagePath();
 
                 Comment comment = Comment.builder()
-                        .id(UUID.randomUUID())
                         .postId(request.getPostId())
                         .userId(userId)
                         .content(request.getContent())
@@ -60,14 +58,13 @@ public class CommentService {
 
                 Comment saved = commentRepository.save(comment);
 
-                UUID postOwnerId = null;
+                String postOwnerId = null;
                 try {
                         postOwnerId = webClient.get()
                                 .uri("http://localhost:8086/api/v1/posts/{postId}", request.getPostId()) // Post service
                                 .retrieve()
                                 .bodyToMono(PostResponse.class)
                                 .map(PostResponse::userId)
-                                .map(UUID::fromString)
                                 .block();
                 } catch (WebClientResponseException e) {
                         log.error("Failed to fetch post owner: {}", e.getMessage());
@@ -93,9 +90,9 @@ public class CommentService {
                 }
 
                 return CommentDto.builder()
-                        .id(saved.getId().toString())
-                        .postId(saved.getPostId().toString())
-                        .userId(saved.getUserId().toString())
+                        .id(saved.getId())
+                        .postId(saved.getPostId())
+                        .userId(saved.getUserId())
                         .content(saved.getContent())
                         .url(imageUrl)
                         .createdAt(saved.getCreatedAt())
@@ -103,12 +100,11 @@ public class CommentService {
         }
 
         public List<CommentDto> getCommentsByPostId(String postId) {
-                UUID postUUID = UUID.fromString(postId);
-                return commentRepository.findByPostId(postUUID).stream()
+                return commentRepository.findByPostId(postId).stream()
                         .map(comment -> CommentDto.builder()
-                                .id(comment.getId().toString())
-                                .postId(comment.getPostId().toString())
-                                .userId(comment.getUserId().toString())
+                                .id(comment.getId())
+                                .postId(comment.getPostId())
+                                .userId(comment.getUserId())
                                 .content(comment.getContent())
                                 .url(comment.getUrl())
                                 .createdAt(comment.getCreatedAt())
@@ -116,15 +112,15 @@ public class CommentService {
                         .collect(Collectors.toList());
         }
 
-        public static record MediaProcessUploadImageRequestDto(String content, String type) {
+        public record MediaProcessUploadImageRequestDto(String content, String type) {
         }
 
-        public static record MediaProcessUploadImageResponseDto(String imagePath) {
+        public record MediaProcessUploadImageResponseDto(String imagePath) {
         }
 
-        public static record PostResponse(String id, String title, String content, String url, String userId) {
+        public record PostResponse(String id, String title, String content, String url, String userId) {
         }
 
-        public static record NotificationRequest(UUID userId, String message) {
+        public record NotificationRequest(String userId, String message) {
         }
 }

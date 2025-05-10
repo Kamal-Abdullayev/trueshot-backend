@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/notifications")
@@ -47,6 +46,6 @@ public class NotificationController {
                 .bodyToMono(String.class)
                 .block();
                 
-        return ResponseEntity.ok(service.getNotificationsForUser(UUID.fromString(userId)));
+        return ResponseEntity.ok(service.getNotificationsForUser(userId));
     }
 }

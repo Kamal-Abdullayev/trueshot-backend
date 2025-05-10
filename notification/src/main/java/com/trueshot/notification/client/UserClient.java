@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class UserClient {
@@ -15,11 +14,11 @@ public class UserClient {
         this.webClient = builder.baseUrl("http://localhost:8087/api/v1/auth").build();
     }
 
-    public List<UUID> getAllUserIds() {
+    public List<String> getAllUserIds() {
         return webClient.get()
                 .uri("/user/ids")
                 .retrieve()
-                .bodyToFlux(UUID.class)
+                .bodyToFlux(String.class)
                 .collectList()
                 .block();
     }

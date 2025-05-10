@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import java.time.*;
 import java.util.List;
 import java.util.Random;
-import java.util.UUID;
 import java.util.concurrent.*;
 
 @Component
@@ -46,8 +45,8 @@ public class DailyChallengeScheduler {
     }
 
     public void sendChallengeNotificationToAllUsers() {
-        List<UUID> userIds = userClient.getAllUserIds();
-        for (UUID userId : userIds) {
+        List<String> userIds = userClient.getAllUserIds();
+        for (String userId : userIds) {
             NotificationDTO dto = NotificationDTO.builder()
                     .userId(userId)
                     .message("📸 It's time to post on Trueshot!")

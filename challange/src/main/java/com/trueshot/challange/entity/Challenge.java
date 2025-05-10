@@ -1,11 +1,13 @@
 package com.trueshot.challange.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "challenges")
@@ -17,17 +19,24 @@ import java.util.UUID;
 public class Challenge {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
 
+    private String title;
     private String content;
+    private String groupId;
+    private String createdBy;
+    private float point;
+    private Reward challengeRewardTag;
 
+    @CreationTimestamp
     private LocalDateTime createdAt;
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
-    private UUID groupId;
-
-    private UUID createdBy;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss  ")
+    private LocalDateTime endTime;
 
     @ElementCollection
-    private Set<UUID> memberIds;
+    private Set<String> memberIds;
 }
