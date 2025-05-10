@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,9 +27,12 @@ public class User {
     @Column(unique = true)
     private String name;
 
+    private float point;
+
     private String password;
 
     private String roles;
+    private Reward groupAccessRole;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "user_followers", joinColumns = @JoinColumn(name = "follower_id"), inverseJoinColumns = @JoinColumn(name = "following_id"))
@@ -38,4 +42,12 @@ public class User {
     @ManyToMany(mappedBy = "following", fetch = FetchType.LAZY)
     @JsonIgnore
     private Set<User> followers = new HashSet<>();
+
+    @ElementCollection
+    private List<String> challengeIds;
+
+    @ManyToMany(mappedBy = "userList", fetch = FetchType.LAZY)
+    private List<Group> groups;
+
+
 }

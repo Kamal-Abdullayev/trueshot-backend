@@ -3,8 +3,7 @@ package com.trueshot.user.users.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "user_groups")
@@ -21,6 +20,13 @@ public class Group {
 
     private String name;
 
+    @ElementCollection
+    private List<String> challengeIds;
+
+    @ElementCollection(targetClass = Reward.class)
+    @Enumerated(EnumType.STRING)
+    private List<Reward> accessRoles;
+
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private User admin;
@@ -29,5 +35,5 @@ public class Group {
     @JoinTable(name = "group_members",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> members = new HashSet<>();
+    private List<User> userList;
 }
