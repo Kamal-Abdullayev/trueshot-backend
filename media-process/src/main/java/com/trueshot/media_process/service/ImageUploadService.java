@@ -25,8 +25,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Service
 public class ImageUploadService {
-    private static final String DEFAULT_IMAGE_PATH = 
-        "https://png.pngtree.com/element_our/20200610/ourmid/pngtree-character-default-avatar-image_2237203.jpg";
     private final MinioConfigConstant minioConfigConstant;
     private final MinioClient minioClient;
     private final HelperConstant projectHelperConstant;
@@ -34,8 +32,8 @@ public class ImageUploadService {
     public ImageListResponseDto saveImage(ImageSaveRequestDto imageSaveRequestDto) {
         String encoded = imageSaveRequestDto.getImageContent();
         if (!StringUtils.hasText(encoded)) {
-            log.warn("Image content is null or empty, using default image");
-            return new ImageListResponseDto(DEFAULT_IMAGE_PATH);
+            log.error("Image content is null or empty");
+            throw new IllegalArgumentException("Image content is required");
         }
 
         log.info("Decoding image content");
@@ -44,14 +42,18 @@ public class ImageUploadService {
             imageContent = Base64.getDecoder()
                     .decode(encoded.getBytes(StandardCharsets.UTF_8));
         } catch (IllegalArgumentException e) {
-            log.warn("Failed to decode image content, using default image: {}", e.getMessage());
-            return new ImageListResponseDto(DEFAULT_IMAGE_PATH);
+            log.error("Failed to decode image content: {}", e.getMessage());
+            throw new IllegalArgumentException("Invalid image format");
         }
 
         String imagePathForFileStorageSystem = UUID.randomUUID() + "/"
                 + System.currentTimeMillis() + "_" + imageSaveRequestDto.getImageName() + ".jpg";
 
         String imageMinioPath = saveImageToMinio(imagePathForFileStorageSystem, imageContent);
+        if (imageMinioPath == null) {
+            throw new IllegalStateException("Failed to upload image to storage");
+        }
+
         String imagePath = projectHelperConstant.getBaseUrl()
                 + projectHelperConstant.getImageFolderPath() + "/" + imageMinioPath;
 
@@ -71,21 +73,21 @@ public class ImageUploadService {
                     .build()
             );
             log.info("Image successfully saved to MinIO bucket: {}", minioConfigConstant.getBucketName());
+            return imagePath;
         } catch (ErrorResponseException e) {
             log.error("Error response from MinIO for image '{}': {}", imagePath, e.errorResponse().message());
-            return DEFAULT_IMAGE_PATH;
+            return null;
         } catch (InsufficientDataException e) {
             log.error("Insufficient data for image '{}': {}", imagePath, e.getMessage());
-            return DEFAULT_IMAGE_PATH;
+            return null;
         } catch (ServerException e) {
             log.error("Server error while uploading image '{}': {}", imagePath, e.getMessage());
-            return DEFAULT_IMAGE_PATH;
+            return null;
         } catch (IOException | InternalException | InvalidKeyException |
                  InvalidResponseException | NoSuchAlgorithmException | XmlParserException e) {
             log.error("General error while uploading image '{}': {}", imagePath, e.getMessage());
-            return DEFAULT_IMAGE_PATH;
+            return null;
         }
-        return imagePath;
     }
 
     public ImageResponseDto readFileFromMinio(String folderPath, String imageName) {

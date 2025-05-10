@@ -27,34 +27,27 @@ public class CommentService {
         private final WebClient webClient;
 
         public CommentDto createComment(CreateCommentRequest request, UUID userId) {
-
-
-                if ((request.getContent() == null || request.getContent().isBlank()) &&
-                        (request.getImageContent() == null || request.getImageContent().isBlank())) {
-                        throw new IllegalArgumentException("Comment must include text or image.");
+                if (request.getImageContent() == null || request.getImageContent().isBlank()) {
+                        throw new IllegalArgumentException("Image is required for comments.");
                 }
 
                 String imageUrl = null;
 
+                Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
+                        .uri("http://localhost:8090/api/v1/image/upload")
+                        .bodyValue(new ImageSaveRequestDto(
+                                request.getImageContent(),
+                                "image"
+                        ))
+                        .retrieve()
+                        .bodyToMono(MediaProcessUploadImageResponseDto.class);
 
-                if (request.getImageContent() != null && !request.getImageContent().isBlank()) {
-                        Mono<MediaProcessUploadImageResponseDto> responseMono = webClient.post()
-                                .uri("http://localhost:8090/api/v1/image/upload")
-                                .bodyValue(new ImageSaveRequestDto(
-                                        request.getImageContent(),
-                                        "image"
-                                ))
-                                .retrieve()
-                                .bodyToMono(MediaProcessUploadImageResponseDto.class);
-
-                        MediaProcessUploadImageResponseDto response = responseMono.block();
-                        if (response == null || response.imagePath() == null) {
-                                throw new IllegalStateException("Image upload failed");
-                        }
-
-                        imageUrl = response.imagePath();
+                MediaProcessUploadImageResponseDto response = responseMono.block();
+                if (response == null || response.imagePath() == null) {
+                        throw new IllegalStateException("Image upload failed");
                 }
 
+                imageUrl = response.imagePath();
 
                 Comment comment = Comment.builder()
                         .id(UUID.randomUUID())
@@ -66,7 +59,6 @@ public class CommentService {
                         .build();
 
                 Comment saved = commentRepository.save(comment);
-
 
                 UUID postOwnerId = null;
                 try {
@@ -80,7 +72,6 @@ public class CommentService {
                 } catch (WebClientResponseException e) {
                         log.error("Failed to fetch post owner: {}", e.getMessage());
                 }
-
 
                 if (postOwnerId != null && !postOwnerId.equals(userId)) {
                         NotificationRequest notificationRequest = new NotificationRequest(

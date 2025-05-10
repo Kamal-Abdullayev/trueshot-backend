@@ -33,6 +33,7 @@ public class PostService {
 
     public List<PostResponseDto> getAllPosts(Pageable pageable, String authHeader) {
         String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        log.debug("Token: {}", token);
         String username = jwtService.extractUsername(token);
 
         String userId = userServiceWebClient.get()
