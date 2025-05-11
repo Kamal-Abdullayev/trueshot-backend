@@ -37,5 +37,11 @@ public class ChallengeController {
 
     }
 
+    @GetMapping("/{challengeId}")
+    public ResponseEntity<ChallengeResponseDto> getChallengeById(@PathVariable("challengeId") String challengeId) {
+        return ResponseEntity.ok(challengeService.getChallengeById(challengeId));
+    }
+
+
 
 }

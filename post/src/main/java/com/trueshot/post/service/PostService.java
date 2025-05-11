@@ -80,11 +80,15 @@ public class PostService {
         if (response == null || response.getImagePath() == null) {
             throw new ResourceNotFoundException("Image not found");
         }
-
+        String challengeId = "0";
+        if (postCreateRequestDto.getChallengeId() != null) {
+            challengeId = postCreateRequestDto.getChallengeId();
+        }
         // Create and save the post
         Post post = Post.builder()
                 .title(postCreateRequestDto.getTitle())
                 .content(postCreateRequestDto.getContent())
+                .challengeId(challengeId)
                 .url(response.getImagePath())
                 .userId(postCreateRequestDto.getUserId())
                 .build();

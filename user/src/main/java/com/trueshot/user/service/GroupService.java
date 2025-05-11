@@ -1,5 +1,6 @@
 package com.trueshot.user.service;
 
+import com.trueshot.user.dto.ChallengeResponseDto;
 import com.trueshot.user.dto.PostResponseDto;
 import com.trueshot.user.jwt.JwtService;
 import com.trueshot.user.dto.AddChallengeToGroupRequestDto;
@@ -23,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class GroupService {
-
     private final GroupRepository groupRepository;
     private final UserRepository userRepository;
     private final JwtService jwtService;
@@ -148,16 +148,32 @@ public class GroupService {
         return postResponseDtoList;
     }
 
-    public String getGroupLastChallengeId(String groupId) {
+    public ChallengeResponseDto getGroupLastChallenge(String groupId, String authHeader) {
+        String challengeId = getGroupLastChallengeId(groupId);
+
+        ChallengeResponseDto postResponseDtoList = webClient.get()
+                .uri("/api/v1/challenge/" + challengeId)
+                .header("Authorization", authHeader)
+                .retrieve()
+                .bodyToMono(ChallengeResponseDto.class)
+                .block();
+
+        log.info("List of the posts for challenge Id: {} retrieved", challengeId);
+
+        return postResponseDtoList;
+    }
+
+
+    private String getGroupLastChallengeId(String groupId) {
         Group group = getGroupObjectByIdO(groupId);
 
         if (group.getChallengeIds() == null || group.getChallengeIds().isEmpty()) {
             throw new RuntimeException("No challenges found in the group");
         }
-        return group.getChallengeIds().getLast();
+        String challengeId = group.getChallengeIds().getLast();
+        log.info("The last challenge ID: {} of {} group", challengeId, group.getName());
+        return challengeId;
     }
-
-
     private Group getGroupObjectByIdO(String groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));

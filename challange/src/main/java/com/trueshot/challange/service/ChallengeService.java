@@ -54,6 +54,11 @@ public class ChallengeService {
                 .toList();
     }
 
+    public ChallengeResponseDto getChallengeById(String challengeId) {
+        log.info("Retrieving challenge by ID: {}", challengeId);
+        return ChallengeResponseDto.convert(challengeRepository.findChallengeById(challengeId)
+                .orElseThrow(() -> new RuntimeException("Challenge not found")));
+    }
 
 
 }

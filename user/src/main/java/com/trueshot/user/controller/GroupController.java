@@ -1,6 +1,7 @@
 package com.trueshot.user.controller;
 
 import com.trueshot.user.dto.AddChallengeToGroupRequestDto;
+import com.trueshot.user.dto.ChallengeResponseDto;
 import com.trueshot.user.dto.PostResponseDto;
 import com.trueshot.user.model.Group;
 import com.trueshot.user.service.GroupService;
@@ -70,8 +71,9 @@ public class GroupController {
     }
 
     @GetMapping("/last-challenge/{groupId}")
-    public ResponseEntity<String> getLastChallenge(@PathVariable("groupId") String groupId) {
-        return ResponseEntity.ok(groupService.getGroupLastChallengeId(groupId));
+    public ResponseEntity<ChallengeResponseDto> getLastChallenge(@PathVariable("groupId") String groupId,
+                                                                       @RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(groupService.getGroupLastChallenge(groupId, authHeader));
     }
 
     @GetMapping("/posts/{groupId}")
