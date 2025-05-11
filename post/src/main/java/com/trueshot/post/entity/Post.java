@@ -1,15 +1,12 @@
 package com.trueshot.post.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,8 +23,11 @@ public class Post {
     private String content;
     private String url;
     private String challengeId;
-
     private String userId;
+
+    @OneToOne
+    @JoinColumn(name = "vote_id", referencedColumnName = "id")
+    private Vote vote;
 
     @CreationTimestamp
     private LocalDateTime createdAt;

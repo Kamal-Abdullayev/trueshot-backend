@@ -1,5 +1,6 @@
 package com.trueshot.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -16,8 +17,9 @@ public class PostResponseDto {
     private String url;
     private String userId;
     private String challengeId;
+    @JsonProperty("vote")
+    private VoteResponseDto voteResponseDto;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
 }

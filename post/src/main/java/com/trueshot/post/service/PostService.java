@@ -3,9 +3,11 @@ package com.trueshot.post.service;
 import com.trueshot.post.constant.KafkaConfigConstant;
 import com.trueshot.post.dto.*;
 import com.trueshot.post.entity.Post;
+import com.trueshot.post.entity.Vote;
 import com.trueshot.post.exception.ResourceNotFoundException;
 import com.trueshot.post.jwt.JwtService;
 import com.trueshot.post.repository.PostRepository;
+import com.trueshot.post.repository.VoteRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -17,6 +19,7 @@ import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,12 +32,11 @@ public class PostService {
     private final WebClient userServiceWebClient;
     private final KafkaTemplate<String, Object> kafkaTemplate;
     private final KafkaConfigConstant configConstant;
+    private final VoteRepository voteRepository;
 
 
     public List<PostResponseDto> getAllPosts(Pageable pageable, String authHeader) {
-        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
-        log.debug("Token: {}", token);
-        String username = jwtService.extractUsername(token);
+        String username = getUsernameFromToken(authHeader);
 
         String userId = userServiceWebClient.get()
                 .uri("/api/v1/auth/user/id-by-username?username=" + username)
@@ -89,10 +91,20 @@ public class PostService {
 
         log.info("Challenge ID will be: {}", challengeId);
         // Create and save the post
+        Vote newVote = Vote.builder()
+                .upVotes(0)
+                .downVotes(0)
+                .userIdsUpVoted(Set.of())
+                .userIdsDownVoted(Set.of())
+                .build();
+        Vote vote = voteRepository.save(newVote);
+        log.info("Vote saved to database: {}", vote);
+
         Post post = Post.builder()
                 .title(postCreateRequestDto.getTitle())
                 .content(postCreateRequestDto.getContent())
                 .challengeId(challengeId)
+                .vote(vote)
                 .url(response.getImagePath())
                 .userId(postCreateRequestDto.getUserId())
                 .build();
@@ -144,5 +156,92 @@ public class PostService {
         ).stream()
                 .map(PostResponseDto::convert)
                 .toList();
+    }
+
+    @Transactional
+    public Integer upVotePost(String postId, String authHeader) {
+        Post post = getPostObjectById(postId);
+        String userId = getUserIdFromToken(authHeader);
+
+        Vote vote = post.getVote();
+        if (vote == null) {
+            log.info("Vote is null, creating a new one");
+            vote = Vote.builder()
+                    .upVotes(0)
+                    .downVotes(0)
+                    .userIdsUpVoted(Set.of())
+                    .userIdsDownVoted(Set.of())
+                    .build();        }
+        log.info("Vote: " + vote);
+        // Toggle off if already upvoted
+        if (vote.getUserIdsUpVoted().contains(userId)) {
+            vote.getUserIdsUpVoted().remove(userId);
+            vote.setUpVotes(vote.getUpVotes() - 1);
+            log.info("User {} removed upvote", userId);
+        } else {
+            // Remove downvote if exists
+            if (vote.getUserIdsDownVoted().remove(userId)) {
+                vote.setDownVotes(vote.getDownVotes() - 1);
+                log.info("User {} removed downvote", userId);
+            }
+            vote.getUserIdsUpVoted().add(userId);
+            vote.setUpVotes(vote.getUpVotes() + 1);
+        }
+
+        post.setVote(vote);
+        voteRepository.save(vote);
+        postRepository.save(post);
+
+        return vote.getUpVotes();
+    }
+
+    @Transactional
+    public Integer downVotePost(String postId, String authHeader) {
+        Post post = getPostObjectById(postId);
+        String userId = getUserIdFromToken(authHeader);
+
+        Vote vote = post.getVote();
+        if (vote == null) {
+            vote = Vote.builder()
+                    .upVotes(0)
+                    .downVotes(0)
+                    .userIdsUpVoted(Set.of())
+                    .userIdsDownVoted(Set.of())
+                    .build();
+        }
+
+        // Toggle off if already downvoted
+        if (vote.getUserIdsDownVoted().contains(userId)) {
+            vote.getUserIdsDownVoted().remove(userId);
+            vote.setDownVotes(vote.getDownVotes() - 1);
+        } else {
+            // Remove upvote if exists
+            if (vote.getUserIdsUpVoted().remove(userId)) {
+                vote.setUpVotes(vote.getUpVotes() - 1);
+            }
+            vote.getUserIdsDownVoted().add(userId);
+            vote.setDownVotes(vote.getDownVotes() + 1);
+        }
+
+        post.setVote(vote);
+        voteRepository.save(vote);
+        postRepository.save(post);
+
+        return vote.getDownVotes();
+    }
+
+    public Vote getVotesByPostId(String postId) {
+        Post post = getPostObjectById(postId);
+        return post.getVote();
+    }
+
+    protected String getUsernameFromToken(String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        return jwtService.extractUsername(token);
+    }
+
+    protected String getUserIdFromToken(String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        return jwtService.extractUserId(token);
     }
 }

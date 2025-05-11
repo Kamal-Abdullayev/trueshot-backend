@@ -4,6 +4,7 @@ import com.trueshot.post.dto.PostCreateRequestDto;
 import com.trueshot.post.dto.PostCreateResponseDto;
 import com.trueshot.post.dto.PostResponseDto;
 import com.trueshot.post.dto.PostUpdateDto;
+import com.trueshot.post.entity.Vote;
 import com.trueshot.post.jwt.JwtService;
 import com.trueshot.post.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -74,4 +75,23 @@ public class PostController {
                                                                         @RequestParam(name = "size", defaultValue = "5") int size) {
         return new ResponseEntity<>(postService.getPostsByChallengeId(challengeId, PageRequest.of(page, size)), HttpStatus.OK);
     }
+
+    @PostMapping("/{postId}/upvote")
+    public ResponseEntity<Integer> upVotePost(@PathVariable String postId,
+                                                 @RequestHeader("Authorization") String authHeader) {
+        return new ResponseEntity<>(postService.upVotePost(postId, authHeader), HttpStatus.OK);
+    }
+
+    @PostMapping("/{postId}/downvote")
+    public ResponseEntity<Integer> downVotePost(@PathVariable String postId,
+                                                   @RequestHeader("Authorization") String authHeader) {
+        return new ResponseEntity<>(postService.downVotePost(postId, authHeader), HttpStatus.OK);
+    }
+
+    @GetMapping("/{postId}/votes")
+    public ResponseEntity<Vote> getPostVote(@PathVariable String postId) {
+        return new ResponseEntity<>(postService.getVotesByPostId(postId), HttpStatus.OK);
+    }
+
+
 }
