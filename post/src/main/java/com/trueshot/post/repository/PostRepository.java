@@ -10,5 +10,5 @@ import java.util.Optional;
 public interface PostRepository extends JpaRepository<Post, String> {
     Optional<List<Post>> findAllPostsByUserId(String userId, Pageable pageable);
     List<Post> findAllByUserIdIn(List<String> userIds);
-
+    Optional<List<Post>> findAllByChallengeId(String challengeId, Pageable pageable);
 }

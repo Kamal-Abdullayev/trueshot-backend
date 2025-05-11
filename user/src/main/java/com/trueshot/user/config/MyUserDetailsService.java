@@ -8,8 +8,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-import com.trueshot.user.users.model.User;
-import com.trueshot.user.users.repository.UserRepository;
+import com.trueshot.user.model.User;
+import com.trueshot.user.repository.UserRepository;
 
 
 @Component

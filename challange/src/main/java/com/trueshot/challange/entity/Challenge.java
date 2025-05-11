@@ -34,8 +34,11 @@ public class Challenge {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss  ")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime endTime;
+
+    @ElementCollection
+    private Set<String> postIds;
 
     @ElementCollection
     private Set<String> memberIds;

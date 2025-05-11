@@ -1,6 +1,6 @@
-package com.trueshot.user.users.dto;
+package com.trueshot.user.dto;
 
-import com.trueshot.user.users.model.Group;
+import com.trueshot.user.model.Group;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

@@ -67,4 +67,11 @@ public class PostController {
     public ResponseEntity<List<PostResponseDto>> getPostsByUserIds(@RequestBody List<String> userIds) {
         return ResponseEntity.ok(postService.getPostsByUserIds(userIds));
     }
+
+    @GetMapping("/challenge/{challengeId}")
+    public ResponseEntity<List<PostResponseDto>> getPostsByChallengeId(@PathVariable String challengeId,
+                                                                        @RequestParam(name = "page", defaultValue = "0") int page,
+                                                                        @RequestParam(name = "size", defaultValue = "5") int size) {
+        return new ResponseEntity<>(postService.getPostsByChallengeId(challengeId, PageRequest.of(page, size)), HttpStatus.OK);
+    }
 }

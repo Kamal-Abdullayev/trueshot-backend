@@ -25,6 +25,7 @@ public class Post {
     private String title;
     private String content;
     private String url;
+    private String challengeId;
 
     private String userId;
 

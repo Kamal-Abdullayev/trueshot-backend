@@ -43,7 +43,8 @@ public class ChallengeService {
                 .build();
 
         log.info("Challenge saved by user ID: {}", username);
-        return ChallengeResponseDto.convert(challengeRepository.save(newChallenge));
+        Challenge challenge = challengeRepository.save(newChallenge);
+        return ChallengeResponseDto.convert(challenge);
     }
 
     public List<ChallengeListResponseDto> retrieveAllChallengeList(Pageable pageable) {
@@ -52,4 +53,7 @@ public class ChallengeService {
                 .map(ChallengeListResponseDto::convert)
                 .toList();
     }
+
+
+
 }

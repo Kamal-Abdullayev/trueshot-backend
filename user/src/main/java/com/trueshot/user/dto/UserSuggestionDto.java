@@ -1,4 +1,4 @@
-package com.trueshot.user.users.dto;
+package com.trueshot.user.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

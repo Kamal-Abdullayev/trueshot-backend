@@ -1,4 +1,4 @@
-package com.trueshot.user.users.model;
+package com.trueshot.user.model;
 
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,6 +1,8 @@
-package com.trueshot.user.users.controller;
+package com.trueshot.user.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.trueshot.user.dto.UserGroupListResponseDto;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -11,25 +13,21 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.trueshot.user.jwt.JwtService;
-import com.trueshot.user.users.dto.UserDto;
-import com.trueshot.user.users.model.User;
-import com.trueshot.user.users.service.UserService;
+import com.trueshot.user.dto.UserDto;
+import com.trueshot.user.model.User;
+import com.trueshot.user.service.UserService;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/auth")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
+    private final UserService userService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     @PostMapping("/authenticate")
     public String authenticateAndGetToken(@RequestBody UserDto userDto) {
@@ -71,4 +69,11 @@ public class UserController {
     public List<User> getAllUsers(Authentication authentication) {
         return userService.getAllUsersExceptCurrent(authentication.getName());
     }
+
+    @GetMapping("/user-groups")
+    public ResponseEntity<UserGroupListResponseDto> getUserGroups(@RequestHeader("Authorization") String authHeader) {
+        return ResponseEntity.ok(userService.getUserGroups(authHeader));
+    }
+
+
 }

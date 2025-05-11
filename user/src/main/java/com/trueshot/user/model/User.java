@@ -1,4 +1,4 @@
-package com.trueshot.user.users.model;
+package com.trueshot.user.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -47,6 +47,7 @@ public class User {
     private List<String> challengeIds;
 
     @ManyToMany(mappedBy = "userList", fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Group> groups;
 
 

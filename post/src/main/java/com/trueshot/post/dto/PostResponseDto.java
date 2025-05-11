@@ -16,7 +16,7 @@ public class PostResponseDto {
     private String content;
     private String url;
     private String userId;
-
+    private String challengeId;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -28,6 +28,7 @@ public class PostResponseDto {
                 .content(post.getContent())
                 .url(post.getUrl())
                 .userId(post.getUserId())
+                .challengeId(post.getChallengeId())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
                 .build();

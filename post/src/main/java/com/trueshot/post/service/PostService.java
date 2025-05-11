@@ -129,4 +129,12 @@ public class PostService {
                 .map(PostResponseDto::convert)
                 .toList();
     }
+
+    public List<PostResponseDto> getPostsByChallengeId(String challengeId, Pageable pageable) {
+        return postRepository.findAllByChallengeId(challengeId, pageable).orElseThrow(
+                () -> new ResourceNotFoundException("Posts not found")
+        ).stream()
+                .map(PostResponseDto::convert)
+                .toList();
+    }
 }

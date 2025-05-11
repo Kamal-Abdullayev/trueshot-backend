@@ -1,26 +1,28 @@
-package com.trueshot.user.users.service;
+package com.trueshot.user.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.trueshot.user.jwt.JwtService;
+import com.trueshot.user.dto.UserGroupListResponseDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.trueshot.user.users.model.User;
-import com.trueshot.user.users.repository.UserRepository;
+import com.trueshot.user.model.User;
+import com.trueshot.user.repository.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Service
 @Slf4j
+@RequiredArgsConstructor
+@Service
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     public User addUser(User user) {
         if (userRepository.findByName(user.getName()).isPresent()) {
@@ -46,5 +48,18 @@ public class UserService {
                 .filter(user -> !user.getName().equals(currentUsername))
                 .collect(Collectors.toList());
     }
+
+    public UserGroupListResponseDto getUserGroups(String authHeader) {
+        String token = authHeader.startsWith("Bearer ") ? authHeader.substring(7) : authHeader;
+        log.debug("Token: {}", token);
+        String username = jwtService.extractUsername(token);
+
+        User user = userRepository.findByName(username).orElseThrow(() ->
+                new UsernameNotFoundException("User not found")
+        );
+        log.info("Get all groups which user is a member of: {}", user.getName());
+        return UserGroupListResponseDto.convert(user);
+    }
+
 
 }

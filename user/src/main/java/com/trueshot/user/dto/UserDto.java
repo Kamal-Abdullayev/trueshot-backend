@@ -1,4 +1,4 @@
-package com.trueshot.user.users.dto;
+package com.trueshot.user.dto;
 
 import jakarta.persistence.Id;
 
@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import com.trueshot.user.users.model.User;
+import com.trueshot.user.model.User;
 
 @Data
 @AllArgsConstructor

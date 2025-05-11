@@ -1,10 +1,10 @@
-package com.trueshot.user.users.controller;
+package com.trueshot.user.controller;
 
 import com.trueshot.user.jwt.JwtService;
-import com.trueshot.user.users.dto.UserResponseDto;
-import com.trueshot.user.users.dto.UserSuggestionDto;
-import com.trueshot.user.users.model.User;
-import com.trueshot.user.users.repository.UserRepository;
+import com.trueshot.user.dto.UserResponseDto;
+import com.trueshot.user.dto.UserSuggestionDto;
+import com.trueshot.user.model.User;
+import com.trueshot.user.repository.UserRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 

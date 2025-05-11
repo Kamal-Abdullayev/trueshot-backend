@@ -1,4 +1,4 @@
-package com.trueshot.feed.dto;
+package com.trueshot.user.dto;
 
 import lombok.*;
 
@@ -6,8 +6,8 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class PostResponseDto {
     private String id;
@@ -19,4 +19,5 @@ public class PostResponseDto {
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+
 }
