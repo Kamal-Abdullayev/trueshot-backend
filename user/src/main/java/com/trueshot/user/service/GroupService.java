@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.catalina.startup.WebAnnotationSet;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
     private final WebClient webClient;
+    private final ResourceLoader resourceLoader;
 
 
     public Group createGroup(String name, String adminUsername) {
@@ -151,16 +153,20 @@ public class GroupService {
     public ChallengeResponseDto getGroupLastChallenge(String groupId, String authHeader) {
         String challengeId = getGroupLastChallengeId(groupId);
 
-        ChallengeResponseDto postResponseDtoList = webClient.get()
+        ChallengeResponseDto postResponseDto = webClient.get()
                 .uri("/api/v1/challenge/" + challengeId)
                 .header("Authorization", authHeader)
                 .retrieve()
                 .bodyToMono(ChallengeResponseDto.class)
                 .block();
 
-        log.info("List of the posts for challenge Id: {} retrieved", challengeId);
+        if (postResponseDto == null) {
+            throw new RuntimeException("Challenge not found");
+        }
 
-        return postResponseDtoList;
+        log.info("List of the posts for challenge Id: {} retrieved", challengeId);
+        postResponseDto.setChallengeId(challengeId);
+        return postResponseDto;
     }
 
 

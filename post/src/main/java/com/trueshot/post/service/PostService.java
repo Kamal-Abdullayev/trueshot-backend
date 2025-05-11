@@ -44,7 +44,7 @@ public class PostService {
 
         log.info("Find all post by user ID: {}", userId);
 
-        return postRepository.findAllPostsByUserId(userId, pageable).orElseThrow(
+        return postRepository.findAllPostsByUserIdOrderByCreatedAtDesc(userId, pageable).orElseThrow(
                 () -> new ResourceNotFoundException("Posts not found")
                 ).stream()
                 .map(PostResponseDto::convert)
@@ -80,10 +80,14 @@ public class PostService {
         if (response == null || response.getImagePath() == null) {
             throw new ResourceNotFoundException("Image not found");
         }
+
+        log.info("Challenge ID: {}", postCreateRequestDto.getChallengeId());
         String challengeId = "0";
         if (postCreateRequestDto.getChallengeId() != null) {
             challengeId = postCreateRequestDto.getChallengeId();
         }
+
+        log.info("Challenge ID will be: {}", challengeId);
         // Create and save the post
         Post post = Post.builder()
                 .title(postCreateRequestDto.getTitle())
@@ -128,14 +132,14 @@ public class PostService {
     }
 
     public List<PostResponseDto> getPostsByUserIds(List<String> userIds) {
-        List<Post> posts = postRepository.findAllByUserIdIn(userIds);
+        List<Post> posts = postRepository.findAllByUserIdInOrderByCreatedAtDesc(userIds);
         return posts.stream()
                 .map(PostResponseDto::convert)
                 .toList();
     }
 
     public List<PostResponseDto> getPostsByChallengeId(String challengeId, Pageable pageable) {
-        return postRepository.findAllByChallengeId(challengeId, pageable).orElseThrow(
+        return postRepository.findAllByChallengeIdOrderByCreatedAtDesc(challengeId, pageable).orElseThrow(
                 () -> new ResourceNotFoundException("Posts not found")
         ).stream()
                 .map(PostResponseDto::convert)
