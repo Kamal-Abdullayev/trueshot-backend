@@ -1,5 +1,7 @@
 package com.trueshot.user.service;
 
+import com.trueshot.user.constant.ConsumerConstant;
+import com.trueshot.user.dto.ChallengeRegisterGroupDto;
 import com.trueshot.user.dto.ChallengeResponseDto;
 import com.trueshot.user.dto.PostResponseDto;
 import com.trueshot.user.jwt.JwtService;
@@ -10,9 +12,9 @@ import com.trueshot.user.repository.GroupRepository;
 import com.trueshot.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.startup.WebAnnotationSet;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,6 +54,22 @@ public class GroupService {
     public Group getGroupById(String groupId) {
         return groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
+    }
+
+    @Transactional
+    @KafkaListener(topics = {ConsumerConstant.TOPIC_NAME}, groupId = ConsumerConstant.GROUP_ID)
+    public void addChallengeToGroup(ChallengeRegisterGroupDto challenge) {
+        log.info("Received challenge: {}", challenge);
+
+        Group group = groupRepository.findById(challenge.getGroupId())
+                .orElseThrow(() -> new RuntimeException("Group not found"));
+
+        if (group.getChallengeIds() == null) {
+            group.setChallengeIds(new ArrayList<>());
+        }
+        group.getChallengeIds().add(challenge.getChallengeId());
+        groupRepository.save(group);
+        log.info("Challenge \"{}\" added to group: {}", challenge.getTitle(), group.getName());
     }
 
     public void addChallengeToGroup(AddChallengeToGroupRequestDto requestDto) {

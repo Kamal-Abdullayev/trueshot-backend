@@ -14,6 +14,21 @@ spring:
     hibernate:
       ddl-auto: update
 
+  kafka:
+    bootstrap-servers: http://localhost:9092
+    schema-registry-url: http://localhost:8081
+    request-timeout-ms: 3000
+    max-block-ms: 3000
+    post-publish-topic: trueshot.recent-activities.challenge
+
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-server: http://localhost:9092
+      group-id: trueshot.recent-activities.consumer
+      schema-registry-url: http://localhost:8081
+      json-use-type-headers: false
+      trusted-packages: com.trueshot.challange.dto
+      json-value-default-type: com.trueshot.challange.dto.PostChallengeSaveDto
 
 server:
   port: 8091

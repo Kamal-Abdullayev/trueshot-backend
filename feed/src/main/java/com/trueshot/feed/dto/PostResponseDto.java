@@ -1,11 +1,11 @@
 package com.trueshot.feed.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -14,8 +14,10 @@ public class PostResponseDto {
     private String title;
     private String content;
     private String url;
-    private String userId;
     private String challengeId;
+    private String userId;
+    @JsonProperty("vote")
+    private VoteResponseDto voteResponseDto;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

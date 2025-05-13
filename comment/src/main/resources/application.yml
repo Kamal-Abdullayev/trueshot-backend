@@ -11,6 +11,13 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  kafka:
+    bootstrap-servers: http://localhost:9092
+    schema-registry-url: http://localhost:8081
+    request-timeout-ms: 3000
+    max-block-ms: 3000
+    post-publish-topic: trueshot.recent-activities.comment
+
 server:
   port: 8082
 

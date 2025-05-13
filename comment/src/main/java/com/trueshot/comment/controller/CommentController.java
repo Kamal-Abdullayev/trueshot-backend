@@ -5,6 +5,7 @@ import com.trueshot.comment.dto.CreateCommentRequest;
 import com.trueshot.comment.security.UserPrincipal;
 import com.trueshot.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,20 +19,10 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<?> createComment(@RequestBody CreateCommentRequest request,
-                                                    @org.springframework.security.core.annotation.AuthenticationPrincipal UserPrincipal userPrincipal) {
-        if (userPrincipal == null) {
-            return ResponseEntity.status(401).build();
-        }
+    public ResponseEntity<CommentDto> createComment(@RequestBody CreateCommentRequest request,
+                                           @RequestHeader("Authorization") String authHeader) {
 
-        try {
-            CommentDto savedComment = commentService.createComment(request, userPrincipal.getId());
-            return ResponseEntity.ok(savedComment);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        } catch (IllegalStateException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        return new ResponseEntity<>(commentService.createComment(request, authHeader), HttpStatus.CREATED);
     }
 
     @GetMapping("/post/{postId}")

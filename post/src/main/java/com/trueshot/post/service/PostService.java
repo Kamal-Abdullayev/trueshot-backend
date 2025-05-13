@@ -18,8 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
 import java.security.InvalidParameterException;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -100,25 +99,29 @@ public class PostService {
         Vote vote = voteRepository.save(newVote);
         log.info("Vote saved to database: {}", vote);
 
-        Post post = Post.builder()
+        Post newPost = Post.builder()
                 .title(postCreateRequestDto.getTitle())
                 .content(postCreateRequestDto.getContent())
                 .challengeId(challengeId)
-                .vote(vote)
                 .url(response.getImagePath())
+                .vote(vote)
                 .userId(postCreateRequestDto.getUserId())
                 .build();
 
-        Post savedPost = postRepository.save(post);
-        log.info("Post saved to database: {}", savedPost);
+        Post post = postRepository.save(newPost);
+        log.info("Post saved to database: {}", post);
 
-        PostCreateResponseDto responseDto = PostCreateResponseDto.convert(savedPost);
+        PostChallengeSaveDto postChallengeSaveDto = PostChallengeSaveDto.builder()
+                .postId(post.getId())
+                .challengeId(challengeId)
+                .build();
 
-        kafkaTemplate.send(configConstant.getPostPublishTopic(), responseDto);
-        log.info("Post with id {} published to {} ", savedPost.getId(), configConstant.getPostPublishTopic());
+        kafkaTemplate.send(configConstant.getPostPublishTopic(), postChallengeSaveDto);
+        log.info("Post with id {} published to {} ", post.getId(), configConstant.getPostPublishTopic());
 
-        return responseDto;
+        return PostCreateResponseDto.convert(post);
     }
+
 
     public PostResponseDto updatePost(String postId, PostUpdateDto postUpdateDto) {
         Post dbPost = getPostObjectById(postId);

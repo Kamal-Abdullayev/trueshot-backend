@@ -12,6 +12,17 @@ spring:
     hibernate:
       ddl-auto: update
 
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-server: http://localhost:9092
+      group-id: trueshot.recent-activities.consumer.notification
+      schema-registry-url: http://localhost:8081
+      json-use-type-headers: false
+      trusted-packages: com.trueshot.notification.dto
+      json-value-default-type: com.trueshot.notification.dto.NotificationDTO
+
+
 server:
   port: 8085
 

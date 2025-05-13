@@ -13,6 +13,16 @@ spring:
     hibernate:
       ddl-auto: update
 
+  kafka:
+    consumer:
+      auto-offset-reset: earliest
+      bootstrap-server: http://localhost:9092
+      group-id: trueshot.recent-activities.consumer.user
+      schema-registry-url: http://localhost:8081
+      json-use-type-headers: false
+      trusted-packages: com.trueshot.user.dto
+      json-value-default-type: com.trueshot.user.dto.ChallengeRegisterGroupDto
+
 server:
   port: 8087
 

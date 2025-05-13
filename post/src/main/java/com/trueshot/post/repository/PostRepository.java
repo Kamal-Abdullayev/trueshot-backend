@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, String> {
     Optional<List<Post>> findAllPostsByUserIdOrderByCreatedAtDesc(String userId, Pageable pageable);
-    List<Post> findAllByUserIdInOrderByCreatedAtDesc(List<String> userIds);
+    List<Post> findAllByUserIdInOrderByCreatedAtDesc    (List<String> userIds);
     Optional<List<Post>> findAllByChallengeIdOrderByCreatedAtDesc(String challengeId, Pageable pageable);
 }
