@@ -21,15 +21,15 @@ spring:
     post-publish-topic: trueshot.recent-activities.post
 
 server:
-  port: 8086
+  port: 0
 
 eureka:
   instance:
-    hostname: localhost
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
   client:
     service-url:
       defaultZone: http://localhost:8099/eureka
-
 
 application:
   security:
