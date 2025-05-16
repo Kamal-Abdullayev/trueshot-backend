@@ -21,7 +21,7 @@ spring:
     post-publish-topic: trueshot.recent-activities.post
 
 server:
-  port: 0
+  port: 8086
 
 eureka:
   instance:
