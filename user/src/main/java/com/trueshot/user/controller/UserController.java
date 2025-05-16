@@ -88,4 +88,20 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/{userId}/points")
+    public ResponseEntity<Void> addPoints(
+            @PathVariable String userId,
+            @RequestBody float points
+    ) {
+        userService.incrementPoints(userId, points);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{userId}/points")
+    public ResponseEntity<Float> getPoints(@PathVariable String userId) {
+        User user = userService.getUserById(userId);
+        return ResponseEntity.ok(user.getPoint());
+    }
+
+
 }

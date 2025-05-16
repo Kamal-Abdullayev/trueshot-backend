@@ -2,6 +2,7 @@ package com.trueshot.user.service;
 
 import com.trueshot.user.jwt.JwtService;
 import com.trueshot.user.dto.UserGroupListResponseDto;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -79,5 +80,22 @@ public class UserService {
         user.getRewards().add(reward);
         userRepository.save(user);
     }
+
+    @Transactional
+    public void incrementPoints(String userId, float pointsToAdd) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userId));
+        user.setPoint(user.getPoint() + pointsToAdd);
+        userRepository.save(user);
+    }
+
+    public User getUserById(String userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + userId));
+    }
+
+
+
+
 
 }

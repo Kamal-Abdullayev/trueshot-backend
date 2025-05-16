@@ -123,6 +123,7 @@ public class ChallengeService {
     }
 
 
+
     @Scheduled(fixedRate = 60000)
     @Transactional
     public void checkEndedChallengesAndAssignRewards() {
@@ -130,51 +131,53 @@ public class ChallengeService {
         List<Challenge> ended = challengeRepository
                 .findByEndTimeBeforeAndRewardAssignedFalse(now);
 
-        for (Challenge challenge : ended) {
+        for (Challenge c : ended) {
             try {
-                // 1) Fetch all posts for this challenge
+                // 1) fetch all posts
                 PostResponseDto[] posts = restTemplate.getForObject(
-                        "http://post/api/v1/post/challenge/" + challenge.getId(),
+                        "http://post/api/v1/post/challenge/" + c.getId(),
                         PostResponseDto[].class
                 );
 
                 if (posts == null || posts.length == 0) {
-                    log.info("No posts for challenge {}", challenge.getId());
+                    log.info("No posts for challenge {}", c.getId());
                 } else {
-                    // 2) Find the post with the highest upVotes
+                    // 2) pick top-voted
                     PostResponseDto top = Arrays.stream(posts)
                             .max(Comparator.comparingInt(p -> p.getVote().getUpVotes()))
                             .orElse(null);
 
                     if (top != null && top.getVote().getUpVotes() > 0) {
-                        String winnerId = top.getUserId();
-                        log.info("Assigning reward '{}' to user '{}' for challenge '{}'",
-                                challenge.getChallengeRewardTag(),
-                                winnerId,
-                                challenge.getId());
-
-                        // 3) Send reward to user service
+                        String userId = top.getUserId();
+                        // 3a) assign reward tag
                         restTemplate.postForObject(
-                                "http://user/api/v1/auth/" + winnerId + "/rewards",
-                                challenge.getChallengeRewardTag(),
+                                "http://user/api/v1/auth/" + userId + "/rewards",
+                                c.getChallengeRewardTag(),
                                 Void.class
                         );
+                        // 3b) add challenge points
+                        restTemplate.postForObject(
+                                "http://user/api/v1/auth/" + userId + "/points",
+                                c.getPoint(),
+                                Void.class
+                        );
+
+                        log.info("Awarded {} points and '{}' reward to user {} for challenge {}",
+                                c.getPoint(), c.getChallengeRewardTag(), userId, c.getId());
                     } else {
-                        log.info("No upvoted posts for challenge {}", challenge.getId());
+                        log.info("No eligible top post for challenge {}", c.getId());
                     }
                 }
 
-                // 4) Mark this challenge so it won't be picked up again
-                challenge.setRewardAssigned(true);
-                challengeRepository.save(challenge);
-                log.info("Marked challenge {} as rewardAssigned", challenge.getId());
+                // 4) mark done
+                c.setRewardAssigned(true);
+                challengeRepository.save(c);
 
             } catch (Exception e) {
-                log.error("Error processing challenge {}: {}",
-                        challenge.getId(), e.getMessage(), e);
-                // continue to next challenge; leave rewardAssigned=false so we retry later
+                log.error("Error processing challenge {}: {}", c.getId(), e.getMessage(), e);
             }
         }
     }
+
 
 }
