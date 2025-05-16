@@ -98,6 +98,13 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<!-- Post Service -->
+		<dependency>
+			<groupId>com.trueshot</groupId>
+			<artifactId>post</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 
 	<build>

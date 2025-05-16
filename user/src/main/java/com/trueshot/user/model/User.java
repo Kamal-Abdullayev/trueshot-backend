@@ -46,9 +46,12 @@ public class User {
     @ElementCollection
     private List<String> challengeIds;
 
+    @ElementCollection(targetClass = Reward.class)
+    @Enumerated(EnumType.STRING)
+    private List<Reward> rewards;
+
     @ManyToMany(mappedBy = "userList", fetch = FetchType.LAZY)
     @JsonIgnore
     private List<Group> groups;
-
 
 }

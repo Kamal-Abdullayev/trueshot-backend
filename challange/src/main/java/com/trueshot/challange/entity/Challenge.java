@@ -28,6 +28,7 @@ public class Challenge {
     private String createdBy;
     private float point;
     private Reward challengeRewardTag;
+    private boolean rewardAssigned = false;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -42,4 +43,7 @@ public class Challenge {
 
     @ElementCollection
     private Set<String> memberIds;
+
+
+
 }

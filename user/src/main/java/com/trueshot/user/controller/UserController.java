@@ -16,6 +16,7 @@ import com.trueshot.user.jwt.JwtService;
 import com.trueshot.user.dto.UserDto;
 import com.trueshot.user.model.User;
 import com.trueshot.user.service.UserService;
+import com.trueshot.user.model.Reward;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,5 +76,16 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserGroups(authHeader));
     }
 
+    @GetMapping("/{userId}/rewards")
+    public ResponseEntity<List<Reward>> getUserRewards(@PathVariable String userId) {
+        List<Reward> rewards = userService.getUserRewards(userId);
+        return ResponseEntity.ok(rewards);
+    }
+
+    @PostMapping("/{userId}/rewards")
+    public ResponseEntity<Void> addRewardToUser(@PathVariable String userId, @RequestBody Reward reward) {
+        userService.addRewardToUser(userId, reward);
+        return ResponseEntity.ok().build();
+    }
 
 }

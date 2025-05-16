@@ -51,6 +51,7 @@ public class SecurityConfig {
                 .cors(withDefaults())
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/auth/authenticate", "/api/v1/auth/signup").permitAll()
+                        .requestMatchers("/users/{userId}/rewards").permitAll()
                         // Allow all from specific IPs (example: 192.168.1.0/24)
                         .requestMatchers("/api/v1/**").access((authentication, context) -> {
                             String remoteAddr = context.getRequest().getRemoteAddr();

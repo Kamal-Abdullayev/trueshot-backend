@@ -6,6 +6,7 @@ import com.trueshot.user.dto.PostResponseDto;
 import com.trueshot.user.model.Group;
 import com.trueshot.user.service.GroupService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/groups")
@@ -72,7 +75,8 @@ public class GroupController {
 
     @GetMapping("/last-challenge/{groupId}")
     public ResponseEntity<ChallengeResponseDto> getLastChallenge(@PathVariable("groupId") String groupId,
-                                                                       @RequestHeader("Authorization") String authHeader) {
+                                                          @RequestHeader("Authorization") String authHeader) {
+        log.info("Getting last challenge for group {}", groupId);
         return ResponseEntity.ok(groupService.getGroupLastChallenge(groupId, authHeader));
     }
 

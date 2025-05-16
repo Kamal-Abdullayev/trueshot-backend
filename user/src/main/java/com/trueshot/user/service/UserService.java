@@ -8,9 +8,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.time.LocalDateTime;
 
 import com.trueshot.user.model.User;
 import com.trueshot.user.repository.UserRepository;
+import com.trueshot.user.model.Reward;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,5 +64,20 @@ public class UserService {
         return UserGroupListResponseDto.convert(user);
     }
 
+    public List<Reward> getUserRewards(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        return user.getRewards();
+    }
+
+    public void addRewardToUser(String userId, Reward reward) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        if (user.getRewards() == null) {
+            user.setRewards(new ArrayList<>());
+        }
+        user.getRewards().add(reward);
+        userRepository.save(user);
+    }
 
 }
