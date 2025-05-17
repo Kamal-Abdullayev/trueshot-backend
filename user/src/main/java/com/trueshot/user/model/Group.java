@@ -38,4 +38,13 @@ public class Group {
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
     private List<User> userList;
+
+    @Builder.Default
+    private boolean exclusive = false;
+
+    @ManyToMany
+    @JoinTable(name = "group_allowed_users",
+            joinColumns = @JoinColumn(name = "group_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<User> allowedUsers;
 }

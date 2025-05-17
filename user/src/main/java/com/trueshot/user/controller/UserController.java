@@ -37,7 +37,7 @@ public class UserController {
 
         if (authentication.isAuthenticated()) {
             User user = userService.getUserByUsername(userDto.getName());
-            String token = jwtService.generateToken(user.getId().toString(), userDto.getName()); // Include userId in token
+            String token = jwtService.generateToken(user.getId().toString(), userDto.getName(), user.getRoles()); // Include userId in token
             log.info("User authenticated successfully: {}", userDto.getName());
             log.info("Generated Token: {}", token);
             return token;

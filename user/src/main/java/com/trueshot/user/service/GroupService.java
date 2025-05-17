@@ -34,14 +34,29 @@ public class GroupService {
     private final ResourceLoader resourceLoader;
 
 
-    public Group createGroup(String name, String adminUsername) {
+    public Group createGroup(String name, String adminUsername, boolean exclusive, List<String> allowedUsernames) {
         User admin = userRepository.findByName(adminUsername)
                 .orElseThrow(() -> new RuntimeException("Admin user not found"));
+
+        if (exclusive && (admin.getRoles() == null || !admin.getRoles().contains("ADMIN"))) {
+            throw new RuntimeException("Only admins can create exclusive groups");
+        }
+
+        List<User> allowedUsers = new ArrayList<>();
+        if (exclusive && allowedUsernames != null) {
+            for (String username : allowedUsernames) {
+                User user = userRepository.findByName(username)
+                        .orElseThrow(() -> new RuntimeException("Allowed user not found: " + username));
+                allowedUsers.add(user);
+            }
+        }
 
         Group group = Group.builder()
                 .name(name)
                 .admin(admin)
                 .userList(new ArrayList<>())
+                .exclusive(exclusive)
+                .allowedUsers(exclusive ? allowedUsers : null)
                 .build();
 
         return groupRepository.save(group);
@@ -88,14 +103,15 @@ public class GroupService {
     public Group joinGroup(String groupId, String username) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new RuntimeException("Group not found"));
-        
         User user = userRepository.findByName(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (group.getUserList().contains(user)) {
             throw new RuntimeException("User is already a member of this group");
         }
-
+        if (group.isExclusive() && (group.getAllowedUsers() == null || !group.getAllowedUsers().contains(user)) && (group.getAdmin() == null || !group.getAdmin().equals(user))) {
+            throw new RuntimeException("You are not allowed to join this exclusive group");
+        }
         group.getUserList().add(user);
         return groupRepository.save(group);
     }
@@ -187,6 +203,20 @@ public class GroupService {
         return postResponseDto;
     }
 
+    public List<Group> getAllGroupsVisibleToUser(String username) {
+        User user = userRepository.findByName(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        List<Group> allGroups = groupRepository.findAll();
+        List<Group> visibleGroups = new ArrayList<>();
+        for (Group group : allGroups) {
+            if (!group.isExclusive() ||
+                (group.getAllowedUsers() != null && group.getAllowedUsers().contains(user)) ||
+                (group.getAdmin() != null && group.getAdmin().equals(user))) {
+                visibleGroups.add(group);
+            }
+        }
+        return visibleGroups;
+    }
 
     private String getGroupLastChallengeId(String groupId) {
         Group group = getGroupObjectByIdO(groupId);
