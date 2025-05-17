@@ -21,15 +21,19 @@ public class GroupController {
     private final GroupService groupService;
 
     @PostMapping("/create")
-    public ResponseEntity<Group> createGroup(@RequestParam String name, Authentication authentication) {
+    public ResponseEntity<Group> createGroup(@RequestParam String name,
+                                             @RequestParam(required = false, defaultValue = "false") boolean exclusive,
+                                             @RequestParam(required = false) List<String> allowedUsernames,
+                                             Authentication authentication) {
         String adminUsername = authentication.getName();
-        Group group = groupService.createGroup(name, adminUsername);
+        Group group = groupService.createGroup(name, adminUsername, exclusive, allowedUsernames);
         return ResponseEntity.ok(group);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<List<Group>> getAllGroups() {
-        return ResponseEntity.ok(groupService.getAllGroups());
+    public ResponseEntity<List<Group>> getAllGroups(Authentication authentication) {
+        String username = authentication.getName();
+        return ResponseEntity.ok(groupService.getAllGroupsVisibleToUser(username));
     }
 
     @GetMapping("/{groupId}")
