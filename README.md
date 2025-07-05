@@ -8,7 +8,7 @@ This is the backend service for **Trueshot**, a social media pet project inspire
 
 Trueshot is a minimal social media concept where users share authentic moments of their day. Similar to BeReal, it encourages genuine photo sharing, but we’ve added our own twists and features to differentiate it.
 
-This repo contains the backend side of the project, written with a focus on practicing the VIPE coding approach:
+This repo contains the backend side of the project, written with a focus on practicing the vipe coding approach:
 
 It may not follow all best practices strictly, but it serves as a solid exploration into modular backend structure and architecture.
 
